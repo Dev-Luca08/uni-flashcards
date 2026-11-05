@@ -47,6 +47,7 @@ img { max-width: 100%; }
   --r: 14px;
   /* folder colours */
   --f0: #2F55D4; --f1: #1E8A4C; --f2: #C77D00; --f3: #C2352B; --f4: #7B4BC9; --f5: #0E8C96;
+  --f6: #C2417F; --f7: #D2601A; --f8: #5B6675; --f9: #6E8B12;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -55,6 +56,7 @@ img { max-width: 100%; }
     --again: #FF8277; --again-soft: #3B1F1E; --hard: #F1B14B; --hard-soft: #3A2E15; --good: #55CC86; --good-soft: #163222;
     --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     --f0: #8FA4FF; --f1: #55CC86; --f2: #F1B14B; --f3: #FF8277; --f4: #B892FF; --f5: #4CC9D2;
+    --f6: #FF86C0; --f7: #FFA463; --f8: #AAB4C2; --f9: #B5D95A;
     color-scheme: dark;
   }
 }
@@ -64,6 +66,7 @@ img { max-width: 100%; }
   --again: #FF8277; --again-soft: #3B1F1E; --hard: #F1B14B; --hard-soft: #3A2E15; --good: #55CC86; --good-soft: #163222;
   --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
     --f0: #8FA4FF; --f1: #55CC86; --f2: #F1B14B; --f3: #FF8277; --f4: #B892FF; --f5: #4CC9D2;
+    --f6: #FF86C0; --f7: #FFA463; --f8: #AAB4C2; --f9: #B5D95A;
   color-scheme: dark;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -139,6 +142,12 @@ button { cursor: pointer; }
 .folder-title { display: flex; align-items: center; gap: 10px; }
 .folder-title i { width: 14px; height: 14px; border-radius: 4px; background: var(--fc); flex: none; }
 .c0 { --fc: var(--f0); } .c1 { --fc: var(--f1); } .c2 { --fc: var(--f2); } .c3 { --fc: var(--f3); } .c4 { --fc: var(--f4); } .c5 { --fc: var(--f5); }
+.c6 { --fc: var(--f6); } .c7 { --fc: var(--f7); } .c8 { --fc: var(--f8); } .c9 { --fc: var(--f9); }
+.swatches { display: flex; flex-wrap: wrap; gap: 8px; }
+.swatch { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--surface); background: var(--fc); box-shadow: 0 0 0 1px var(--line); padding: 0; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 3px var(--ink); }
+.color-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: -4px 0 16px; }
+.color-row .lbl { font-size: .875rem; color: var(--muted); }
 .deck { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
 .deck-main { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 16px 16px 12px; }
 .deck-main h2 { font-size: 1.25rem; margin-bottom: 4px; overflow-wrap: anywhere; }
@@ -304,6 +313,75 @@ kbd { font-family: ui-monospace, Menlo, monospace; font-size: .7rem; border: 1px
 
 #toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: .9375rem; max-width: calc(100% - 32px); box-shadow: var(--shadow); z-index: 20; }
 
+/* Online: top bar, people, chat, sharing */
+.icon-btn svg, .btn svg { width: 22px; height: 22px; flex: none; }
+.btn.icon-only { padding: 0 10px; }
+.btn.icon-only svg { width: 18px; height: 18px; }
+.top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.top-icons { display: flex; align-items: center; gap: 2px; }
+.badge-btn { position: relative; color: var(--ink); }
+.badge { position: absolute; top: 2px; right: 2px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: var(--again); color: #fff; font-size: .6875rem; font-weight: 700; display: grid; place-items: center; line-height: 1; }
+.badge.static { position: static; }
+.avatar { --h: 220; width: 34px; height: 34px; border-radius: 50%; display: inline-grid; place-items: center; flex: none; background: hsl(var(--h) 55% 42%); color: #fff; font-weight: 700; font-size: .9375rem; font-family: var(--font-display); }
+.avatar.big { width: 64px; height: 64px; font-size: 1.6rem; }
+.avatar-btn { border: 0; background: none; padding: 4px; border-radius: 50%; }
+.login-banner { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--accent-soft); border-radius: var(--r); padding: 12px 14px; margin-bottom: 16px; }
+.login-banner > div { flex: 1 1 200px; min-width: 0; }
+.center { text-align: center; justify-content: center; }
+.grow { flex: 1; min-width: 0; display: grid; }
+.list { display: grid; gap: 6px; }
+.list-row { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; flex-wrap: wrap; }
+.row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; background: none; border: 0; padding: 0; text-align: left; overflow-wrap: anywhere; }
+.title-btn { flex: 1; }
+.pill { display: inline-flex; align-items: center; gap: 4px; font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+.pill.ok { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--hard-soft); color: var(--hard); }
+.help.ok { color: var(--good); }
+.help.bad { color: var(--again); }
+.profile-head { display: flex; align-items: center; gap: 14px; }
+.profile-head h2 { font-size: 1.5rem; overflow-wrap: anywhere; }
+.stats.six { grid-template-columns: repeat(3, 1fr); }
+.stat.flame b { color: var(--hard); }
+.tabs.two { grid-template-columns: 1fr 1fr; }
+.share-line { font-size: .8125rem; color: var(--muted); margin-top: 2px; }
+.fdot { width: 14px; height: 14px; border-radius: 4px; background: var(--fc, var(--accent)); flex: none; }
+.fdot.set { background: var(--surface-2); border: 2px solid var(--muted); border-radius: 3px; }
+.notif { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.notif.unread { border-color: var(--accent); background: color-mix(in srgb, var(--accent-soft) 60%, var(--surface)); }
+.notif .row-main { flex: none; }
+.notif .btn-row { margin-top: 8px; }
+.chat-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.chat-meta { display: grid; justify-items: end; gap: 4px; }
+.one-line { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chat { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.chat-msgs { flex: 1; display: flex; flex-direction: column; gap: 8px; padding-block: 8px 12px; min-height: 50vh; overflow-y: auto; }
+.msg { display: grid; justify-items: start; gap: 2px; max-width: 85%; }
+.msg.mine { justify-items: end; align-self: flex-end; }
+.bubble { background: var(--surface); border: 1px solid var(--line); border-radius: 16px 16px 16px 4px; padding: 8px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.msg.mine .bubble { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); border-radius: 16px 16px 4px 16px; }
+.bubble.reminder, .msg.mine .bubble.reminder { background: var(--hard-soft); border-color: var(--hard-soft); color: var(--ink); }
+.msg .time { font-size: .6875rem; color: var(--muted); }
+.invite-card { display: flex; gap: 10px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.invite-card b { font-size: 1.05rem; }
+.invite-card .btn-row { margin-top: 8px; }
+.composer { display: flex; gap: 8px; position: sticky; bottom: 0; padding-block: 10px calc(10px + env(safe-area-inset-bottom, 0px)); background: var(--bg); }
+.composer .field { flex: 1; min-width: 0; }
+.picker { margin-bottom: 10px; }
+.pick-row { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.pick-row .muted { margin-left: auto; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+.seg button { border: 0; background: transparent; border-radius: 9px; min-height: 40px; font-weight: 700; font-size: .8125rem; color: var(--muted); padding: 0 4px; }
+.seg button[aria-checked="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.member-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--surface-2); border-radius: 999px; padding: 3px 8px 3px 3px; }
+.member-chip .avatar { width: 26px; height: 26px; font-size: .75rem; }
+.member-chip .x { border: 0; background: none; font-size: 1.1rem; color: var(--muted); padding: 0 2px; }
+.link-btn { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.comment { border-top: 1px dashed var(--line); padding-top: 10px; display: grid; gap: 6px; }
+.comment.done, .comment.dismissed { opacity: .65; }
+textarea.small-ta { min-height: 90px; font-family: var(--font-body); font-size: .9375rem; }
+.card-comment { margin-top: 8px; }
+
 @media (max-width: 460px) {
   .folders { grid-template-columns: 1fr 1fr; }
   .opts { grid-template-columns: 1fr; }
@@ -425,14 +503,15 @@ const Store = {
   },
   saveLocal() {
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify(decks));
+      localStorage.setItem(LS_KEY, JSON.stringify(decks.filter(d => !d.ro)));
       localStorage.setItem(LS_TOMB, JSON.stringify([...this.tombs]));
-      localStorage.setItem(LS_FOLDERS, JSON.stringify({ list: folders, updated: foldersUpdated }));
+      localStorage.setItem(LS_FOLDERS, JSON.stringify({ list: folders.filter(f => !f.ro), updated: foldersUpdated }));
     } catch (e) { /* storage blocked: keep in memory */ }
   },
   touchFolders() {
     foldersUpdated = Date.now();
     this.saveLocal();
+    if (this.mode === 'supa') { Cloud.saveShared(); Cloud.scheduleFolders(); return; }
     if (this.mode !== 'cloud') return;
     clearTimeout(this.folderTimer);
     this.folderTimer = setTimeout(() => { this.folderTimer = null; this.queueFolders(); }, 600);
@@ -514,14 +593,17 @@ const Store = {
   },
 
   touch(deck) {
+    if (deck.ro) { Cloud.saveShared(); if (this.mode === 'supa') Cloud.scheduleProgress(deck); return; }
     deck.updated = Date.now();
     this.saveLocal();
+    if (this.mode === 'supa') { Cloud.scheduleDeck(deck.id); return; }
     if (this.mode !== 'cloud') return;
     clearTimeout(this.timers.get(deck.id));
     this.timers.set(deck.id, setTimeout(() => { this.timers.delete(deck.id); this.queuePush(deck.id); }, 900));
   },
 
   flush() {
+    if (this.mode === 'supa') { Cloud.flush(); Stats.flush(); return; }
     for (const [id, t] of this.timers) { clearTimeout(t); this.queuePush(id); }
     this.timers.clear();
     if (this.folderTimer) { clearTimeout(this.folderTimer); this.folderTimer = null; this.queueFolders(); }
@@ -572,6 +654,7 @@ const Store = {
     decks = decks.filter(d => d.id !== id);
     clearTimeout(this.timers.get(id)); this.timers.delete(id);
     this.saveLocal();
+    if (this.mode === 'supa') { clearTimeout(Cloud.timers.get(id)); Cloud.timers.delete(id); Cloud.queueDeleteDeck(id); return; }
     if (this.mode !== 'cloud') return;
     this.chain = this.chain.then(async () => {
       await this.write(() => this.col.doc('tombs').set({ kind: 'tombs', ids: [...this.tombs].slice(-500) }));
@@ -599,6 +682,7 @@ const Store = {
 };
 
 function syncInfo() {
+  if (Store.mode === 'supa') return Store.errorShown ? ['error', 'Offline: later gesynct'] : ['cloud', 'Gesynchroniseerd'];
   if (Store.mode === 'cloud' && Store.errorShown) return ['error', 'Sync onderbroken'];
   if (Store.mode === 'cloud') return ['cloud', 'Gesynchroniseerd'];
   if (Store.mode === 'connecting') return ['connecting', 'Verbinden…'];
@@ -1028,7 +1112,8 @@ function setStart() {
   const d = getDeck(session.deckId);
   const s = d.opt?.start ?? 0;
   session.start = s === -1 ? Math.floor(Math.random() * d.n) : Math.min(s, d.n - 1);
-  session.side = 0; session.revealed = false;
+  session.side = 0; session.revealed = false; session.commenting = false;
+  Stats.add('s');
 }
 function currentCard() { const d = getDeck(session.deckId); return d && d.cards.find(c => c.id === session.queue[0]); }
 
@@ -1055,13 +1140,14 @@ function answer(grade) {
     c.st = 'learn';
     if (grade === 'good') {
       c.k++; session.st.good++;
-      if (c.k >= 2) { c.st = 'review'; c.k = 0; c.iv = c.iv > 0 ? Math.max(1, Math.round(c.iv * 1.2)) : 1; c.due = today() + c.iv; session.st.learned++; }
+      if (c.k >= 2) { c.st = 'review'; c.k = 0; c.iv = c.iv > 0 ? Math.max(1, Math.round(c.iv * 1.2)) : 1; c.due = today() + c.iv; session.st.learned++; Stats.add('l'); }
       else gap = GAP.good;
     } else if (grade === 'hard') { c.k = 0; gap = GAP.hard; session.st.hard++; }
     else { c.k = 0; gap = GAP.again; session.st.again++; }
   }
   if (gap) session.queue.splice(Math.min(gap, session.queue.length), 0, cid);
   session.answered++;
+  Stats.add('a');
   Store.touch(d);
   if (!session.queue.length) { view = { name: 'done', deckId: d.id }; render(); return; }
   setStart(); session.anim = true; render();
@@ -1081,6 +1167,7 @@ function flip() {
   const d = getDeck(session.deckId);
   session.side = (session.side + 1) % d.n;
   session.revealed = true; session.anim = true;
+  Stats.add('s');
   render();
 }
 
@@ -1173,14 +1260,16 @@ function installHint() {
    Views
    ========================================================= */
 const brandSvg = `<svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true"><rect x="9" y="5" width="30" height="22" rx="4" transform="rotate(8 24 16)" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/><rect x="5" y="14" width="30" height="22" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><line x1="5" y1="21" x2="35" y2="21" stroke="var(--rule-red)" stroke-width="2"/><line x1="10" y1="27" x2="30" y2="27" stroke="var(--rule-blue)" stroke-width="2"/><line x1="10" y1="31" x2="24" y2="31" stroke="var(--rule-blue)" stroke-width="2"/></svg>`;
-const FOLDER_COLORS = 6;
+const FOLDER_COLORS = 10;
+const swatches = (sel) => `<div class="swatches" role="group" aria-label="Kleur van de map">${Array.from({ length: FOLDER_COLORS }, (_, i) =>
+  `<button type="button" class="swatch c${i}" data-act="folder-color" data-c="${i}" aria-label="Kleur ${i + 1}" aria-pressed="${sel === i}"></button>`).join('')}</div>`;
 let homeFolder = null;
 
 const getFolder = id => folders.find(f => f.id === id);
 const deckFolder = d => (d.folder && getFolder(d.folder)) ? d.folder : '';
 const byRecent = (a, b) => Math.max(b.last || 0, b.created || 0) - Math.max(a.last || 0, a.created || 0);
 const folderOptions = (sel) => `<option value=""${!sel ? ' selected' : ''}>Geen map</option>` +
-  folders.map(f => `<option value="${f.id}"${sel === f.id ? ' selected' : ''}>${esc(f.name)}</option>`).join('') +
+  folders.filter(f => !f.ro).map(f => `<option value="${f.id}"${sel === f.id ? ' selected' : ''}>${esc(f.name)}</option>`).join('') +
   `<option value="__new__">+ Nieuwe map…</option>`;
 
 function deckCard(d) {
@@ -1193,13 +1282,15 @@ function deckCard(d) {
     <button class="deck-main" data-act="study" data-id="${d.id}" aria-label="Oefen ${esc(d.name)}">
       <h2>${esc(d.name)}</h2>
       <p class="meta">${d.n} kanten · ${plural(s.total, 'kaart', 'kaarten')} · ${d.names.slice(0, d.n).map(esc).join(' → ')}</p>
+      ${shareLine(d, 'deck')}
       <div class="meter" aria-hidden="true"><span class="m-known" style="width:${pk}%"></span><span class="m-learn" style="width:${pl}%"></span></div>
       <div class="legend"><span><i class="dot k"></i>Gekend <b>${s.kn}</b></span><span><i class="dot l"></i>Aan het leren <b>${s.lr}</b></span><span><i class="dot n"></i>Nieuw <b>${s.nw}</b></span></div>
     </button>
     <div class="deck-foot">
       <span class="todo">${todo}</span>
       <div class="acts">
-        <button class="btn ghost sm" data-act="edit" data-id="${d.id}">Bewerken</button>
+        ${d.ro ? '' : `<button class="btn ghost sm" data-act="edit" data-id="${d.id}">Bewerken</button>`}
+        ${ONLINE && Cloud.sb ? `<button class="btn ghost sm icon-only" data-act="item" data-kind="deck" data-id="${d.id}" aria-label="${d.ro ? 'Info en opmerkingen' : 'Delen en zichtbaarheid'}" title="${d.ro ? 'Info' : 'Delen'}">${ICON.gear}</button>` : ''}
         ${s.todo ? `<button class="btn primary sm" data-act="study" data-id="${d.id}">Oefenen</button>`
                  : `<button class="btn sm" data-act="cram" data-id="${d.id}" ${s.total ? '' : 'disabled'}>Alles oefenen</button>`}
       </div>
@@ -1207,10 +1298,23 @@ function deckCard(d) {
   </article>`;
 }
 
+// "van @lisa · 👥 3 leden" or "🌍 Openbaar · 👥 2 leden" (only when logged in)
+function shareLine(o, kind) {
+  if (!ONLINE || !Cloud.user) return '';
+  const parts = [];
+  if (o.ro) parts.push(`van @${esc(o.ownerName || '')}`);
+  else if ((o.vis || 'private') !== 'private') parts.push(VIS_SHORT[o.vis]);
+  const n = o.ro ? (o.members || 1) : Cloud.memberCount(Cloud.user.id, kind, o.id);
+  if (n > 1) parts.push(`👥 ${plural(n, 'lid', 'leden')}`);
+  return parts.length ? `<p class="share-line">${parts.join(' · ')}</p>` : '';
+}
+
 function newFolderForm() {
   return `<form class="card-box folder-form" data-form="new-folder">
       <label class="lbl" for="f-name">Naam van de map</label>
-      <input class="field" id="f-name" placeholder="bv. Spaans, Economie, Geschiedenis" autocomplete="off" maxlength="40">
+      <input class="field" id="f-name" placeholder="bv. Spaans, Economie, Geschiedenis" autocomplete="off" maxlength="40" value="${esc(view.newFolderName || '')}">
+      <p class="lbl">Kleur</p>
+      ${swatches(view.newColor ?? folders.length % FOLDER_COLORS)}
       <div class="btn-row"><button class="btn primary sm" type="submit">Map maken</button><button class="btn sm" type="button" data-act="folder-cancel">Annuleren</button></div>
     </form>`;
 }
@@ -1229,6 +1333,7 @@ function renderHome() {
         <span class="folder-tab" aria-hidden="true"></span>
         <span class="folder-name">${esc(f.name)}</span>
         <span class="folder-meta">${plural(ds.length, 'set', 'sets')} · ${plural(cards, 'kaart', 'kaarten')}</span>
+        ${shareLine(f, 'folder').replace('<p class="share-line">', '<span class="folder-meta share-line">').replace('</p>', '</span>')}
         <span class="folder-todo">${todo ? `<b>${todo}</b> te oefenen` : (ds.length ? 'Klaar voor vandaag' : 'Nog leeg')}</span>
       </button>`;
   }).join('');
@@ -1255,9 +1360,10 @@ function renderHome() {
   } else main = empty;
 
   return `<header class="home-head">
-      <div class="brand">${brandSvg}<div><h1>Luca Flashcards</h1><p>Je sets en mappen</p></div></div>
-      <span id="sync" class="sync ${cls}"><i></i>${esc(txt)}</span>
+      <div class="brand">${brandSvg}<div><h1>Luca Flashcards</h1><p>${Cloud.user && Cloud.me ? '@' + esc(Cloud.me.username) : 'Je sets en mappen'}</p></div></div>
+      ${topIcons()}
     </header>
+    ${loginBanner()}
     <div class="home-actions">
       <button class="btn primary new-btn" data-act="new">+ Nieuwe set</button>
       <button class="btn new-btn" data-act="folder-new">+ Nieuwe map</button>
@@ -1289,17 +1395,20 @@ function renderFolder(fid) {
       ? `<div class="card-box danger-zone"><p>Map <b>${esc(f.name)}</b> verwijderen? ${ds.length ? `De ${plural(ds.length, 'set', 'sets')} erin blijven bewaard bij “Sets zonder map”.` : ''}</p>
           <div class="btn-row"><button class="btn sm danger solid" data-act="folder-delete-yes">Ja, map verwijderen</button><button class="btn sm" data-act="folder-manage-cancel">Annuleren</button></div></div>`
       : '';
+  const gear = ONLINE && Cloud.sb ? `<button class="btn sm" data-act="item" data-kind="folder" data-id="${f.id}">${ICON.gear}<span>${f.ro ? 'Info' : 'Delen'}</span></button>` : '';
   return `<header class="bar"><button class="icon-btn" data-act="folder-back" aria-label="Terug naar alle mappen">←</button>
-      <h1 class="folder-title c${f.c % FOLDER_COLORS}"><i aria-hidden="true"></i>${esc(f.name)}</h1></header>
-    <div class="home-actions">
+      <h1 class="folder-title c${f.c % FOLDER_COLORS}"><i aria-hidden="true"></i>${esc(f.name)}</h1>${gear}</header>
+    ${shareLine(f, 'folder')}
+    ${f.ro ? `<p class="muted small" style="margin:-4px 0 14px">Je bent lid van deze map. Alleen @${esc(f.ownerName || '')} kan sets toevoegen of bewerken; jij oefent met je eigen voortgang.</p>` : `<div class="home-actions">
       <button class="btn primary new-btn" data-act="new">+ Nieuwe set in deze map</button>
     </div>
     <div class="btn-row folder-tools">
       <button class="btn ghost sm" data-act="folder-rename">Hernoemen</button>
       <button class="btn ghost sm" data-act="folder-delete">Map verwijderen</button>
-    </div>
+    </div>`}
+    <div class="color-row"><span class="lbl">${f.ro ? 'Mijn kleur' : 'Kleur'}</span>${swatches(f.c % FOLDER_COLORS)}</div>
     ${manage}
-    <section class="decks">${ds.length ? ds.map(deckCard).join('') : `<div class="empty"><p class="muted">Nog geen sets in deze map. Maak er hierboven een, of verplaats een bestaande set via <b>Bewerken → Map</b>.</p></div>`}</section>
+    <section class="decks">${ds.length ? ds.map(deckCard).join('') : `<div class="empty"><p class="muted">${f.ro ? 'Er staan nog geen sets in deze map.' : 'Nog geen sets in deze map. Maak er hierboven een, of verplaats een bestaande set via <b>Bewerken → Map</b>.'}</p></div>`}</section>
     <footer class="footer">Made by <b>Luca Cicarelli</b></footer>`;
 }
 
@@ -1509,8 +1618,16 @@ function renderStudy() {
       <button class="icon-btn" data-act="study-exit" aria-label="Stoppen">✕</button>
       <div class="title"><b>${esc(d.name)}</b>
         <span class="counts"><span class="c-new">${cNew} nieuw</span><span class="c-learn">${cLearn} leren</span><span class="c-rev">${cRev} herhalen</span></span></div>
+      ${d.ro && Cloud.user ? `<button class="icon-btn" data-act="card-comment" aria-label="Opmerking of voorstel over deze kaart" title="Opmerking over deze kaart">${ICON.chat}</button>` : ''}
       <button class="icon-btn" data-act="undo" aria-label="Vorige antwoord ongedaan maken" title="Ongedaan maken" ${session.history.length ? '' : 'disabled'}>↶</button>
     </header>
+    ${session.commenting ? `<form class="card-box card-comment" data-form="card-comment">
+      <p class="lbl">Opmerking over “${esc(c.s[0] || '')}”</p>
+      <p class="help" style="margin-top:0">Alleen @${esc(d.ownerName || '')} (de eigenaar) ziet dit.</p>
+      <textarea class="field small-ta" id="cc-body" maxlength="2000" placeholder="bv. De vertaling klopt niet, het moet … zijn" required></textarea>
+      <label class="check"><input type="checkbox" id="cc-sugg" checked> Dit is een voorgestelde aanpassing</label>
+      <div class="btn-row"><button class="btn primary sm" type="submit">Versturen</button><button class="btn sm" type="button" data-act="card-comment">Annuleren</button></div>
+    </form>` : ''}
     <div class="progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
     <div class="stage"><div class="card-wrap">
       <button class="flash${anim ? ' anim' : ''}" data-act="flip" aria-label="Kaart: ${esc(d.names[sideIdx])}. Tik om om te draaien.">
@@ -1553,7 +1670,12 @@ function renderDone() {
 
 function render() {
   const v = view.name;
-  app.innerHTML = v === 'new' ? renderWizard() : v === 'edit' ? renderEdit() : v === 'study' ? renderStudy() : v === 'done' ? renderDone() : renderHome();
+  const views = {
+    new: renderWizard, edit: renderEdit, study: renderStudy, done: renderDone,
+    auth: renderAuth, profile: renderProfile, friends: renderFriends, notifs: renderNotifs,
+    chats: renderChats, chat: renderChat, item: renderItem, link: renderLink
+  };
+  app.innerHTML = (views[v] || renderHome)();
 }
 
 /* =========================================================
@@ -1567,15 +1689,15 @@ function moveDeckSide(d, i, dir) {
   d.cards.forEach(c => { while (c.s.length < d.n) c.s.push(''); swapAt(c.s, i, j); });
   if (d.opt && d.opt.start === i) d.opt.start = j; else if (d.opt && d.opt.start === j) d.opt.start = i;
 }
-function createFolder(name) {
-  const f = { id: uid(), name: name.slice(0, 40), c: folders.length % FOLDER_COLORS, created: Date.now() };
+function createFolder(name, color) {
+  const f = { id: uid(), name: name.slice(0, 40), c: color ?? folders.length % FOLDER_COLORS, created: Date.now(), u: Date.now(), vis: 'private' };
   folders.push(f); Store.touchFolders(); return f;
 }
 function goHome() { session = null; view = { name: 'home', folder: homeFolder }; render(); scrollTo(0, 0); }
 
 const ACT = {
   home() { goHome(); },
-  new() { startWizard(null, view.name === 'home' ? (view.folder || '') : ''); },
+  new() { const fo = view.name === 'home' && view.folder && getFolder(view.folder); startWizard(null, fo && !fo.ro ? fo.id : ''); },
   sample() {
     const rows = [
       ['el perro', 'dog', 'El perro duerme en el sofá.'], ['la manzana', 'apple', 'Me como una manzana cada mañana.'],
@@ -1589,19 +1711,32 @@ const ACT = {
   'open-folder'(el) { homeFolder = el.dataset.id; view = { name: 'home', folder: homeFolder }; render(); scrollTo(0, 0); },
   'folder-back'() { homeFolder = null; view = { name: 'home' }; render(); scrollTo(0, 0); },
   'folder-new'() { view.newFolder = true; render(); const i = document.getElementById('f-name'); if (i) i.focus(); },
-  'folder-cancel'() { view.newFolder = false; render(); },
+  'folder-cancel'() { view.newFolder = false; view.newFolderName = ''; view.newColor = null; render(); },
+  'folder-color'(el) {
+    const c = +el.dataset.c;
+    if (view.newFolder) {
+      const inp = document.getElementById('f-name'); if (inp) view.newFolderName = inp.value;
+      view.newColor = c; render(); const i = document.getElementById('f-name'); if (i) i.focus(); return;
+    }
+    const f = getFolder(view.name === 'item' ? view.id : view.folder); if (!f) return;
+    f.c = c;
+    if (f.ro) { Cloud.saveShared(); if (Cloud.user) Cloud.sb.rpc('set_member_color', { p_owner: f.owner, p_kind: 'folder', p_item: f.srcId, p_color: c }); render(); return; }
+    f.u = Date.now(); Store.touchFolders(); render();
+  },
   'folder-rename'() { view.rename = true; view.confirm = null; render(); const i = document.getElementById('f-rename'); if (i) { i.focus(); i.select(); } },
   'folder-delete'() { view.confirm = 'folder'; view.rename = false; render(); },
   'folder-manage-cancel'() { view.confirm = null; view.rename = false; render(); },
   'folder-delete-yes'() {
     const f = getFolder(view.folder); if (!f) return;
-    decks.forEach(d => { if (d.folder === f.id) { d.folder = ''; Store.touch(d); } });
+    if (f.ro) return;
+    decks.forEach(d => { if (d.folder === f.id && !d.ro) { d.folder = ''; Store.touch(d); } });
+    Store.tombs.add('f:' + f.id);
     folders = folders.filter(x => x.id !== f.id); Store.touchFolders();
     homeFolder = null; view = { name: 'home' }; render(); toast(`Map "${f.name}" verwijderd`);
   },
   study(el) { startStudy(el.dataset.id, false); },
   cram(el) { startStudy(el.dataset.id, true); },
-  edit(el) { view = { name: 'edit', deckId: el.dataset.id }; render(); scrollTo(0, 0); },
+  edit(el) { const d = getDeck(el.dataset.id); if (d && d.ro) { openItem('deck', d.id); return; } view = { name: 'edit', deckId: el.dataset.id }; render(); scrollTo(0, 0); },
   'edit-back'() { const id = wiz && wiz.append; wiz = null; if (id) { view = { name: 'edit', deckId: id }; render(); } else goHome(); },
   'wiz-back'() { wiz.error = ''; wiz.step = Math.max(wiz.append ? 2 : 1, wiz.step - 1); render(); },
   'wiz-n'(el) { wiz.n = +el.dataset.n; render(); },
@@ -1722,11 +1857,11 @@ app.addEventListener('submit', e => {
   if (form.dataset.form === 'new-folder') {
     const name = (document.getElementById('f-name').value || '').trim();
     if (!name) { document.getElementById('f-name').focus(); return; }
-    const f = createFolder(name);
+    const f = createFolder(name, view.newColor ?? undefined);
     homeFolder = f.id; view = { name: 'home', folder: f.id }; render(); toast(`Map "${f.name}" gemaakt`);
   } else if (form.dataset.form === 'rename-folder') {
     const f = getFolder(view.folder); const name = (document.getElementById('f-rename').value || '').trim();
-    if (f && name) { f.name = name.slice(0, 40); Store.touchFolders(); }
+    if (f && name && !f.ro) { f.name = name.slice(0, 40); f.u = Date.now(); Store.touchFolders(); }
     view.rename = false; render();
   }
 });
@@ -1804,8 +1939,1130 @@ document.addEventListener('keydown', e => {
   else if ((e.key === 'z' || e.key === 'Z') && !e.metaKey && !e.ctrlKey) undo();
 });
 
+/* =========================================================
+   Online (stand-alone app only): accounts, sync, friends,
+   profile & stats, notifications, chat, sharing as member
+   ========================================================= */
+const SUPA_URL = 'https://lbbrjaiowqzmgdxkkyhv.supabase.co';
+const SUPA_KEY = 'sb_publishable_CvSmtVjupgSQ56MaKe_iTA_j1_kUvTq';
+const SUPA_JS = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/dist/umd/supabase.min.js';
+const ONLINE = !window.claude; // claude.ai pages cannot reach other servers
+const LS_SHARED = 'tarjeta.shared.v1';
+const LS_OWNER = 'tarjeta.owner.v1';
+const LS_STATS = 'tarjeta.stats.pending.v1';
+
+const dayStr = (d = new Date()) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+const lsGet = (k, def) => { try { const v = localStorage.getItem(k); return v == null ? def : JSON.parse(v); } catch (e) { return def; } };
+const lsSet = (k, v) => { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } };
+const appUrl = () => location.origin + location.pathname;
+const fmtNum = n => Number(n || 0).toLocaleString('nl-BE');
+function timeAgo(iso) {
+  const s = (Date.now() - new Date(iso).getTime()) / 1000;
+  if (s < 60) return 'net nu';
+  if (s < 3600) return Math.floor(s / 60) + ' min';
+  if (s < 86400) return Math.floor(s / 3600) + ' u';
+  const d = Math.floor(s / 86400); return d === 1 ? 'gisteren' : d + ' d';
+}
+function hue(s) { let h = 0; for (const c of String(s || '')) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+const avatar = (name, big) => `<span class="avatar${big ? ' big' : ''}" style="--h:${hue(name)}" aria-hidden="true">${esc(String(name || '?').slice(0, 1).toUpperCase())}</span>`;
+const ICON = {
+  chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>',
+  people: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="17" cy="9" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17.5 14.5c2.2.3 3.6 1.9 4 4.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
+  gear: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1 7 17M17 7l2.1-2.1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>'
+};
+const VIS = { private: 'Privé', friends: 'Alleen vrienden', public: 'Openbaar' };
+const VIS_SHORT = { private: '🔒 Privé', friends: '👥 Vrienden', public: '🌍 Openbaar' };
+const encP = c => [c.st === 'review' ? 'r' : c.st === 'learn' ? 'l' : 'n', c.k | 0, c.iv | 0, c.due | 0, c.reps | 0, c.lapses | 0];
+const decP = a => Array.isArray(a) ? { st: a[0] === 'r' ? 'review' : a[0] === 'l' ? 'learn' : 'new', k: a[1] || 0, iv: a[2] || 0, due: a[3] || 0, reps: a[4] || 0, lapses: a[5] || 0 } : null;
+const sharedId = (owner, id) => 's.' + owner + '.' + id;
+
+/* ---------- Study statistics (counted on this device, sent to your account) ---------- */
+const Stats = {
+  pending: {},
+  load() { const v = lsGet(LS_STATS, {}); this.pending = v && typeof v === 'object' ? v : {}; },
+  add(k, n = 1) {
+    if (!ONLINE) return;
+    const p = this.pending[dayStr()] ||= { a: 0, s: 0, l: 0 };
+    p[k] += n; lsSet(LS_STATS, this.pending);
+    if (Cloud.user) { clearTimeout(this.t); this.t = setTimeout(() => this.flush(), 8000); }
+  },
+  async flush() {
+    if (!Cloud.user || this.busy) return;
+    this.busy = true;
+    try {
+      for (const day of Object.keys(this.pending)) {
+        const p = this.pending[day];
+        delete this.pending[day]; lsSet(LS_STATS, this.pending);
+        if (!p || (!p.a && !p.s && !p.l)) continue;
+        const { error } = await Cloud.sb.rpc('add_study', { p_day: day, p_answers: p.a, p_sides: p.s, p_learned: p.l });
+        if (error) { const q = this.pending[day] ||= { a: 0, s: 0, l: 0 }; q.a += p.a; q.s += p.s; q.l += p.l; lsSet(LS_STATS, this.pending); break; }
+      }
+    } catch (e) { /* offline: try later */ } finally { this.busy = false; }
+  }
+};
+
+/* ---------- Supabase connection ---------- */
+const Cloud = {
+  sb: null, user: null, me: null, ready: false,
+  friends: [], incoming: [], outgoing: [], members: {}, nameCache: {},
+  unreadNotif: 0, unreadChat: 0,
+  written: new Map(), timers: new Map(), progTimers: new Map(), folderTimer: null, chain: Promise.resolve(),
+
+  async init() {
+    if (!ONLINE) return;
+    try { await loadScript(SUPA_JS, 'supabase'); } catch (e) { return; }
+    this.sb = window.supabase.createClient(SUPA_URL, SUPA_KEY, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    this.sb.auth.onAuthStateChange(ev => {
+      if (ev === 'PASSWORD_RECOVERY') setTimeout(() => { view = { name: 'auth', mode: 'newpass' }; render(); }, 0);
+    });
+    try {
+      const { data } = await this.sb.auth.getSession();
+      if (data && data.session) await this.start(data.session.user);
+    } catch (e) { /* offline */ }
+    this.ready = true;
+  },
+
+  async start(user) {
+    this.user = user;
+    const prev = lsGet(LS_OWNER, null);
+    if (prev && prev !== user.id) { decks = []; folders = []; foldersUpdated = 0; Store.tombs = new Set(); this.clearShared(); Store.saveLocal(); }
+    lsSet(LS_OWNER, user.id);
+    Store.mode = 'supa'; Store.errorShown = false;
+    try {
+      await this.loadMe();
+      await this.pullOwn();
+      await this.loadShared();
+      await this.refreshSocial();
+    } catch (e) { console.warn('Luca Flashcards sync', e); Store.errorShown = true; }
+    this.subscribe();
+    this.startPolling();
+    Stats.flush();
+  },
+
+  async loadMe() {
+    const { data } = await this.sb.from('profiles').select('id,username,display_name,created_at').eq('id', this.user.id).maybeSingle();
+    this.me = data || { id: this.user.id, username: (this.user.user_metadata || {}).username || 'ik' };
+    this.nameCache[this.me.id] = this.me.username;
+  },
+
+  async names(ids) {
+    const need = [...new Set(ids.filter(id => id && !this.nameCache[id]))];
+    if (need.length) {
+      const { data } = await this.sb.from('profiles').select('id,username').in('id', need);
+      (data || []).forEach(p => { this.nameCache[p.id] = p.username; });
+    }
+    const out = {}; ids.forEach(id => { out[id] = this.nameCache[id] || 'onbekend'; }); return out;
+  },
+
+  /* ---- your own sets and folders ---- */
+  async pullOwn() {
+    const uid = this.user.id;
+    const [fr, dr] = await Promise.all([
+      this.sb.from('folders').select('id,name,color,visibility,deleted,updated_at').eq('owner', uid),
+      this.sb.from('decks').select('id,data,deleted,updated_at').eq('owner', uid)
+    ]);
+    if (fr.error) throw fr.error;
+    if (dr.error) throw dr.error;
+    const cf = new Map(fr.data.map(r => [r.id, r]));
+    const outF = [], pushF = [];
+    for (const f of folders.filter(f => !f.ro)) {
+      if (Store.tombs.has('f:' + f.id)) continue;
+      const r = cf.get(f.id); cf.delete(f.id);
+      if (!r) { outF.push(f); pushF.push(f.id); continue; }
+      if (r.deleted) continue;
+      if ((f.u || 0) > (r.updated_at || 0)) { outF.push(f); pushF.push(f.id); }
+      else outF.push({ ...f, name: r.name, c: r.color, vis: r.visibility, u: r.updated_at });
+    }
+    for (const r of cf.values()) if (!r.deleted && !Store.tombs.has('f:' + r.id)) outF.push({ id: r.id, name: r.name, c: r.color, vis: r.visibility, u: r.updated_at, created: r.updated_at });
+
+    const cd = new Map(dr.data.map(r => [r.id, r]));
+    const outD = [], pushD = [];
+    for (const d of decks.filter(d => !d.ro)) {
+      if (Store.tombs.has(d.id)) continue;
+      const r = cd.get(d.id); cd.delete(d.id);
+      if (!r) { outD.push(d); pushD.push(d.id); continue; }
+      if (r.deleted) continue;
+      if ((d.updated || 0) > (r.updated_at || 0) || !r.data || !Array.isArray(r.data.cards)) { outD.push(d); pushD.push(d.id); }
+      else outD.push(r.data);
+    }
+    for (const r of cd.values()) if (!r.deleted && r.data && Array.isArray(r.data.cards) && !Store.tombs.has(r.id)) outD.push(r.data);
+
+    const delF = [...Store.tombs].filter(t => t.startsWith('f:')).map(t => t.slice(2)).filter(id => fr.data.some(r => r.id === id && !r.deleted));
+    const delD = [...Store.tombs].filter(t => !t.startsWith('f:')).filter(id => dr.data.some(r => r.id === id && !r.deleted));
+    folders = [...outF, ...folders.filter(f => f.ro)];
+    decks = [...outD, ...decks.filter(d => d.ro)];
+    Store.saveLocal();
+    outF.forEach(f => { if (!pushF.includes(f.id)) this.written.set('f:' + f.id, this.folderSig(f)); });
+    pushF.forEach(id => { const f = getFolder(id); if (f) this.written.set('f:' + id, this.folderSig(f)); this.queueFolder(id); });
+    pushD.forEach(id => this.queueDeck(id));
+    delF.forEach(id => this.queueDeleteFolder(id));
+    delD.forEach(id => this.queueDeleteDeck(id));
+  },
+
+  run(fn) {
+    this.chain = this.chain.then(fn).then(() => {
+      if (Store.errorShown) { Store.errorShown = false; updateSyncChip(); }
+    }).catch(e => {
+      console.warn('Luca Flashcards sync', e);
+      if (!Store.errorShown) { Store.errorShown = true; updateSyncChip(); }
+    });
+    return this.chain;
+  },
+  scheduleDeck(id) {
+    clearTimeout(this.timers.get(id));
+    this.timers.set(id, setTimeout(() => { this.timers.delete(id); this.queueDeck(id); }, 1200));
+  },
+  queueDeck(id) {
+    return this.run(async () => {
+      const d = getDeck(id); if (!d || d.ro || !this.user) return;
+      const { error } = await this.sb.from('decks').upsert({
+        owner: this.user.id, id: d.id, folder_id: d.folder || null, name: String(d.name || '').slice(0, 200),
+        visibility: d.vis || 'private', card_count: d.cards.length, data: d, deleted: false, updated_at: d.updated || Date.now()
+      });
+      if (error) throw error;
+    });
+  },
+  queueDeleteDeck(id) {
+    return this.run(async () => {
+      if (!this.user) return;
+      const { error } = await this.sb.from('decks').upsert({ owner: this.user.id, id, deleted: true, data: {}, card_count: 0, updated_at: Date.now() });
+      if (error) throw error;
+    });
+  },
+  folderSig: f => JSON.stringify([f.name, f.c, f.vis || 'private']),
+  scheduleFolders() {
+    clearTimeout(this.folderTimer);
+    this.folderTimer = setTimeout(() => { this.folderTimer = null; this.pushFolders(); }, 700);
+  },
+  pushFolders() {
+    for (const f of folders) {
+      if (f.ro) continue;
+      const sig = this.folderSig(f);
+      if (this.written.get('f:' + f.id) !== sig) { this.written.set('f:' + f.id, sig); this.queueFolder(f.id); }
+    }
+    for (const t of Store.tombs) {
+      if (t.startsWith('f:') && !this.written.has('del:' + t)) { this.written.set('del:' + t, '1'); this.queueDeleteFolder(t.slice(2)); }
+    }
+  },
+  queueFolder(id) {
+    return this.run(async () => {
+      const f = getFolder(id); if (!f || f.ro || !this.user) return;
+      const { error } = await this.sb.from('folders').upsert({
+        owner: this.user.id, id: f.id, name: String(f.name || '').slice(0, 60), color: f.c || 0,
+        visibility: f.vis || 'private', deleted: false, updated_at: f.u || Date.now()
+      });
+      if (error) throw error;
+    });
+  },
+  queueDeleteFolder(id) {
+    return this.run(async () => {
+      if (!this.user) return;
+      const { error } = await this.sb.from('folders').upsert({ owner: this.user.id, id, deleted: true, updated_at: Date.now() });
+      if (error) throw error;
+    });
+  },
+  scheduleProgress(d) {
+    clearTimeout(this.progTimers.get(d.id));
+    this.progTimers.set(d.id, setTimeout(() => { this.progTimers.delete(d.id); this.queueProgress(d.id); }, 1500));
+  },
+  queueProgress(id) {
+    return this.run(async () => {
+      const d = getDeck(id); if (!d || !d.ro || !this.user) return;
+      const progress = {};
+      d.cards.forEach(c => { if (c.st !== 'new' || c.reps) progress[c.id] = encP(c); });
+      const { error } = await this.sb.from('deck_progress').upsert({ user_id: this.user.id, owner: d.owner, deck_id: d.srcId, progress, updated_at: Date.now() });
+      if (error) throw error;
+    });
+  },
+  flush() {
+    for (const [id, t] of this.timers) { clearTimeout(t); this.queueDeck(id); }
+    this.timers.clear();
+    for (const [id, t] of this.progTimers) { clearTimeout(t); this.queueProgress(id); }
+    this.progTimers.clear();
+    if (this.folderTimer) { clearTimeout(this.folderTimer); this.folderTimer = null; this.pushFolders(); }
+  },
+  async settle() { this.flush(); await this.chain; },
+
+  /* ---- shared with you (you are a member) ---- */
+  clearShared() { decks = decks.filter(d => !d.ro); folders = folders.filter(f => !f.ro); lsSet(LS_SHARED, null); },
+  saveShared() { lsSet(LS_SHARED, { decks: decks.filter(d => d.ro), folders: folders.filter(f => f.ro) }); },
+  loadSharedLocal() {
+    const s = lsGet(LS_SHARED, null);
+    if (s && Array.isArray(s.decks)) { decks.push(...s.decks.filter(d => d && Array.isArray(d.cards))); folders.push(...(s.folders || [])); }
+  },
+  memberCount(owner, kind, item) { return (this.members[owner + '|' + kind + '|' + item] || []).length + 1; },
+
+  async loadShared() {
+    if (!this.user) return;
+    await this.settle();
+    const uid = this.user.id;
+    const [all, pr] = await Promise.all([
+      this.sb.from('memberships').select('owner,kind,item_id,member,color'),
+      this.sb.from('deck_progress').select('owner,deck_id,progress')
+    ]);
+    if (all.error) throw all.error;
+    this.members = {};
+    (all.data || []).forEach(r => { const k = r.owner + '|' + r.kind + '|' + r.item_id; (this.members[k] ||= []).push(r.member); });
+    const mine = (all.data || []).filter(r => r.member === uid);
+    const prog = {}; (pr.data || []).forEach(r => { prog[r.owner + '|' + r.deck_id] = r.progress || {}; });
+    const names = await this.names(mine.map(m => m.owner));
+    const old = new Map(decks.filter(d => d.ro).map(d => [d.id, d]));
+    const newF = [], newD = [];
+    const mkDeck = (owner, row, folderSid) => {
+      const data = row.data || {};
+      const sid = sharedId(owner, row.id);
+      const p = prog[owner + '|' + row.id] || {};
+      const prev = old.get(sid);
+      const prevCards = prev ? new Map(prev.cards.map(c => [c.id, c])) : new Map();
+      const cards = (data.cards || []).map(c => {
+        const q = decP(p[c.id]) || (prevCards.has(c.id) ? prevCards.get(c.id) : null);
+        return { id: c.id, s: c.s || [], st: q ? q.st : 'new', k: q ? q.k : 0, iv: q ? q.iv : 0, due: q ? q.due : 0, reps: q ? q.reps : 0, lapses: q ? q.lapses : 0 };
+      });
+      return {
+        id: sid, srcId: row.id, ro: true, owner, ownerName: names[owner], name: data.name || row.name || 'Set',
+        n: data.n || 2, names: data.names || DEFAULT_NAMES.slice(0, data.n || 2), langs: data.langs || [],
+        opt: prev ? prev.opt : (data.opt || { newLimit: 30, start: 0, shuffle: true }),
+        folder: folderSid || '', cards, created: data.created || Date.now(), updated: row.updated_at || 0,
+        last: prev ? prev.last : 0, vis: row.visibility, members: this.memberCount(owner, 'deck', row.id)
+      };
+    };
+    for (const m of mine.filter(m => m.kind === 'folder')) {
+      const { data: f } = await this.sb.from('folders').select('id,name,color,visibility,deleted').eq('owner', m.owner).eq('id', m.item_id).maybeSingle();
+      if (!f || f.deleted) continue;
+      const fsid = sharedId(m.owner, f.id);
+      newF.push({ id: fsid, srcId: f.id, ro: true, owner: m.owner, ownerName: names[m.owner], name: f.name, c: m.color ?? f.color, vis: f.visibility, members: this.memberCount(m.owner, 'folder', f.id), created: 0 });
+      const { data: ds } = await this.sb.from('decks').select('id,name,data,updated_at,visibility').eq('owner', m.owner).eq('folder_id', f.id).eq('deleted', false);
+      (ds || []).forEach(r => newD.push(mkDeck(m.owner, r, fsid)));
+    }
+    for (const m of mine.filter(m => m.kind === 'deck')) {
+      if (newD.some(d => d.id === sharedId(m.owner, m.item_id))) continue;
+      const { data: r } = await this.sb.from('decks').select('id,name,data,updated_at,visibility,deleted').eq('owner', m.owner).eq('id', m.item_id).maybeSingle();
+      if (!r || r.deleted) continue;
+      newD.push(mkDeck(m.owner, r, ''));
+    }
+    decks = [...decks.filter(d => !d.ro), ...newD];
+    folders = [...folders.filter(f => !f.ro), ...newF];
+    this.saveShared();
+  },
+
+  /* ---- friends, counters, live updates ---- */
+  async refreshSocial() {
+    if (!this.user) return;
+    const uid = this.user.id;
+    const { data: fs } = await this.sb.from('friendships').select('id,requester,addressee,status');
+    const others = (fs || []).map(f => f.requester === uid ? f.addressee : f.requester);
+    const names = await this.names(others);
+    this.friends = []; this.incoming = []; this.outgoing = [];
+    for (const f of fs || []) {
+      const other = f.requester === uid ? f.addressee : f.requester;
+      const p = { id: other, username: names[other], fid: f.id };
+      if (f.status === 'accepted') this.friends.push(p);
+      else if (f.addressee === uid) this.incoming.push(p);
+      else this.outgoing.push(p);
+    }
+    this.friends.sort((a, b) => a.username.localeCompare(b.username));
+    await this.refreshCounts();
+  },
+  async refreshCounts() {
+    if (!this.user) return;
+    const uid = this.user.id;
+    const [n, m] = await Promise.all([
+      this.sb.from('notifications').select('id', { count: 'exact', head: true }).eq('user_id', uid).is('read_at', null),
+      this.sb.from('messages').select('id', { count: 'exact', head: true }).eq('to_user', uid).is('read_at', null)
+    ]);
+    this.unreadNotif = n.count || 0; this.unreadChat = m.count || 0;
+    updateBadges();
+  },
+  relation(uid) {
+    if (!this.user) return 'none';
+    if (uid === this.user.id) return 'me';
+    if (this.friends.some(f => f.id === uid)) return 'friend';
+    if (this.incoming.some(f => f.id === uid)) return 'incoming';
+    if (this.outgoing.some(f => f.id === uid)) return 'outgoing';
+    return 'none';
+  },
+  subscribe() {
+    try {
+      if (this.channel) this.sb.removeChannel(this.channel);
+      const uid = this.user.id;
+      this.channel = this.sb.channel('me-' + uid)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'to_user=eq.' + uid }, p => this.onMessage(p.new))
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'notifications', filter: 'user_id=eq.' + uid }, p => this.onNotification(p.new))
+        .subscribe();
+    } catch (e) { /* polling still works */ }
+  },
+  onMessage(msg) {
+    if (view.name === 'chat' && view.uid === msg.from_user) { Chat.receive(msg); this.sb.rpc('mark_chat_read', { p_other: msg.from_user }); }
+    else { this.unreadChat++; updateBadges(); if (view.name === 'chats') Chat.loadList(); }
+  },
+  async onNotification(n) {
+    this.unreadNotif++; updateBadges();
+    const who = (await this.names([n.actor]))[n.actor];
+    toast(notifText(n, who).replace(/<[^>]+>/g, ''));
+    if (n.type === 'friend_request' || n.type === 'friend_accepted') await this.refreshSocial();
+    if (n.type === 'invite_accepted' || n.type === 'member_joined') await this.loadShared();
+    if (view.name === 'notifs') Notifs.load(); else softRender();
+  },
+  startPolling() {
+    clearInterval(this.poll);
+    this.poll = setInterval(() => { if (document.visibilityState === 'visible' && this.user) this.refreshCounts().catch(() => {}); }, 45000);
+  },
+
+  /* ---- account ---- */
+  async signUp(email, password, username) {
+    const u = String(username || '').trim().toLowerCase();
+    if (!/^[a-z0-9_.]{3,20}$/.test(u)) return 'Je gebruikersnaam moet 3 tot 20 tekens hebben: kleine letters, cijfers, _ of .';
+    const { data: ok } = await this.sb.rpc('username_available', { u });
+    if (!ok) return 'Deze gebruikersnaam is al bezet. Kies een andere.';
+    const { data, error } = await this.sb.auth.signUp({ email: String(email).trim(), password, options: { data: { username: u } } });
+    if (error) return authError(error);
+    if (!data.session) return 'Je account is gemaakt. Bevestig eerst je e-mailadres via de mail die je kreeg, en log daarna in.';
+    await this.start(data.user);
+    return null;
+  },
+  async signIn(email, password) {
+    const { data, error } = await this.sb.auth.signInWithPassword({ email: String(email).trim(), password });
+    if (error) return authError(error);
+    await this.start(data.user);
+    return null;
+  },
+  async signOut() {
+    try { await this.settle(); await Stats.flush(); } catch (e) { /* ignore */ }
+    try { if (this.channel) this.sb.removeChannel(this.channel); } catch (e) { /* ignore */ }
+    clearInterval(this.poll);
+    await this.sb.auth.signOut();
+    this.user = null; this.me = null; this.friends = []; this.incoming = []; this.outgoing = []; this.members = {};
+    this.unreadNotif = 0; this.unreadChat = 0; this.written.clear();
+    decks = []; folders = []; foldersUpdated = 0; Store.tombs = new Set(); Store.mode = 'local';
+    lsSet(LS_OWNER, null); this.clearShared(); Store.saveLocal();
+  }
+};
+
+function authError(e) {
+  const m = String((e && e.message) || '');
+  if (/invalid login/i.test(m)) return 'E-mailadres of wachtwoord klopt niet.';
+  if (/already registered|already exists/i.test(m)) return 'Er bestaat al een account met dit e-mailadres. Log in.';
+  if (/at least 6|password should/i.test(m)) return 'Je wachtwoord moet minstens 6 tekens hebben.';
+  if (/rate limit|too many/i.test(m)) return 'Te veel pogingen na elkaar. Wacht een paar minuten en probeer opnieuw.';
+  if (/database error saving new user/i.test(m)) return 'Deze gebruikersnaam is al bezet of ongeldig. Kies een andere.';
+  if (/invalid.*email|email.*invalid/i.test(m)) return 'Dit e-mailadres is niet geldig.';
+  if (/fetch|network/i.test(m)) return 'Geen verbinding. Controleer je internet.';
+  return 'Er ging iets mis: ' + m;
+}
+
+function updateBadges() {
+  const set = (id, n) => { const el = document.getElementById(id); if (el) { el.textContent = n > 9 ? '9+' : n; el.hidden = !n; } };
+  set('b-chat', Cloud.unreadChat); set('b-notif', Cloud.unreadNotif); set('b-friends', Cloud.incoming.length);
+}
+function softRender() {
+  const a = document.activeElement;
+  if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName)) { updateBadges(); return; }
+  if (['home', 'friends', 'profile', 'item'].includes(view.name)) render(); else updateBadges();
+}
+
+/* ---------- Top bar icons ---------- */
+function topIcons() {
+  const [cls, txt] = syncInfo();
+  const chip = `<span id="sync" class="sync ${cls}"><i></i>${esc(txt)}</span>`;
+  if (!ONLINE || !Cloud.sb) return chip;
+  if (!Cloud.user) return `<div class="top-right">${chip}<button class="btn sm primary" data-act="auth">Inloggen</button></div>`;
+  return `<div class="top-right"><nav class="top-icons" aria-label="Vrienden en berichten">
+      <button class="icon-btn badge-btn" data-act="chats" aria-label="Chat">${ICON.chat}<span class="badge" id="b-chat" ${Cloud.unreadChat ? '' : 'hidden'}>${Cloud.unreadChat}</span></button>
+      <button class="icon-btn badge-btn" data-act="notifs" aria-label="Meldingen">${ICON.bell}<span class="badge" id="b-notif" ${Cloud.unreadNotif ? '' : 'hidden'}>${Cloud.unreadNotif}</span></button>
+      <button class="icon-btn badge-btn" data-act="friends" aria-label="Vrienden">${ICON.people}<span class="badge" id="b-friends" ${Cloud.incoming.length ? '' : 'hidden'}>${Cloud.incoming.length}</span></button>
+      <button class="avatar-btn" data-act="profile" data-uid="${Cloud.user.id}" aria-label="Mijn profiel">${avatar(Cloud.me && Cloud.me.username)}</button>
+    </nav>${chip}</div>`;
+}
+function loginBanner() {
+  if (!ONLINE || !Cloud.sb || Cloud.user) return '';
+  return `<div class="login-banner"><div><b>Maak een gratis account</b><p class="muted small">Je sets op al je toestellen, vrienden toevoegen, chatten en mappen delen.</p></div>
+    <button class="btn primary sm" data-act="auth" data-mode="signup">Account maken</button></div>`;
+}
+const backBar = (title, act = 'home', extra = '') => `<header class="bar"><button class="icon-btn" data-act="${act}" aria-label="Terug">←</button><h1>${title}</h1>${extra}</header>`;
+
+/* ---------- Account screens ---------- */
+function renderAuth() {
+  const m = view.mode || 'login';
+  const err = view.error ? `<p class="error" role="alert">${esc(view.error)}</p>` : '';
+  const busy = view.busy ? 'disabled' : '';
+  if (m === 'reset') {
+    return backBar('Wachtwoord vergeten', 'auth') + `<section class="panel"><form class="card-box" data-form="reset">
+      <p class="help" style="margin-top:0">Vul je e-mailadres in. Je krijgt een mail met een link om een nieuw wachtwoord te kiezen.</p>
+      <label class="lbl" for="a-email">E-mailadres</label><input class="field" id="a-email" type="email" autocomplete="email" required>
+      ${err}<button class="btn primary block" type="submit" ${busy}>Stuur mail</button></form></section>`;
+  }
+  if (m === 'newpass') {
+    return backBar('Nieuw wachtwoord') + `<section class="panel"><form class="card-box" data-form="newpass">
+      <label class="lbl" for="a-pass">Nieuw wachtwoord</label><input class="field" id="a-pass" type="password" minlength="6" autocomplete="new-password" required>
+      ${err}<button class="btn primary block" type="submit" ${busy}>Opslaan</button></form></section>`;
+  }
+  const signup = m === 'signup';
+  return backBar(signup ? 'Account maken' : 'Inloggen') + `<section class="panel">
+    <div class="tabs two" role="tablist">
+      <button role="tab" aria-selected="${!signup}" data-act="auth" data-mode="login">Inloggen</button>
+      <button role="tab" aria-selected="${signup}" data-act="auth" data-mode="signup">Account maken</button>
+    </div>
+    <form class="card-box" data-form="${signup ? 'signup' : 'login'}">
+      ${signup ? `<label class="lbl" for="a-user">Gebruikersnaam</label>
+        <input class="field" id="a-user" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="20" placeholder="bv. luca.c" value="${esc(view.username || '')}" required>
+        <p class="help" id="a-user-help">3 tot 20 tekens: kleine letters, cijfers, _ of . Zo vinden vrienden je.</p>` : ''}
+      <label class="lbl" for="a-email">E-mailadres</label>
+      <input class="field" id="a-email" type="email" autocomplete="email" value="${esc(view.email || '')}" required>
+      <label class="lbl" for="a-pass">Wachtwoord</label>
+      <input class="field" id="a-pass" type="password" minlength="6" autocomplete="${signup ? 'new-password' : 'current-password'}" required>
+      ${err}
+      <button class="btn primary block" type="submit" ${busy}>${view.busy ? 'Even geduld…' : signup ? 'Account maken' : 'Inloggen'}</button>
+      ${signup ? '' : '<button class="btn ghost sm" type="button" data-act="auth" data-mode="reset">Wachtwoord vergeten?</button>'}
+    </form>
+    <p class="muted small">${decks.filter(d => !d.ro).length ? 'De sets die nu op dit toestel staan, worden aan je account toegevoegd.' : 'Met een account staan je sets op al je toestellen.'}</p>
+    <button class="btn ghost block" data-act="home">Verder zonder account</button>
+  </section>`;
+}
+let userCheckT;
+function checkUsername(v) {
+  clearTimeout(userCheckT);
+  const help = document.getElementById('a-user-help'); if (!help) return;
+  const u = v.trim().toLowerCase();
+  if (!/^[a-z0-9_.]{3,20}$/.test(u)) { help.textContent = '3 tot 20 tekens: kleine letters, cijfers, _ of . Zo vinden vrienden je.'; help.className = 'help'; return; }
+  userCheckT = setTimeout(async () => {
+    const { data } = await Cloud.sb.rpc('username_available', { u });
+    const h = document.getElementById('a-user-help'); if (!h) return;
+    h.textContent = data ? `✓ @${u} is nog vrij` : `✗ @${u} is al bezet`;
+    h.className = 'help ' + (data ? 'ok' : 'bad');
+  }, 400);
+}
+async function afterLogin() {
+  const pf = view.pendingFriend;
+  if (pf) { await openProfileByName(pf); return; }
+  view = { name: 'home' }; render(); scrollTo(0, 0);
+}
+
+/* ---------- Profile & statistics ---------- */
+async function openProfile(uid) {
+  view = { name: 'profile', uid, loading: true }; render(); scrollTo(0, 0);
+  const v = view;
+  if (uid === Cloud.user.id) await Stats.flush();
+  const [p, st] = await Promise.all([
+    Cloud.sb.from('profiles').select('id,username,display_name,created_at').eq('id', uid).maybeSingle(),
+    Cloud.sb.rpc('get_stats', { p_user: uid, p_today: dayStr() })
+  ]);
+  let fl = [], dl = [];
+  if (uid !== Cloud.user.id) {
+    const [a, b] = await Promise.all([
+      Cloud.sb.from('folders').select('id,name,color,visibility').eq('owner', uid).eq('deleted', false),
+      Cloud.sb.from('decks').select('id,name,card_count,folder_id,visibility').eq('owner', uid).eq('deleted', false)
+    ]);
+    fl = a.data || []; dl = b.data || [];
+  }
+  if (view !== v) return;
+  view.loading = false;
+  view.data = { profile: p.data, stats: (st.data && st.data[0]) || {}, folders: fl, decks: dl };
+  render();
+}
+async function openProfileByName(name) {
+  const { data } = await Cloud.sb.from('profiles').select('id').eq('username', String(name).toLowerCase()).maybeSingle();
+  if (data) openProfile(data.id); else { toast(`@${name} bestaat niet (meer).`); view = { name: 'home' }; render(); }
+}
+function statTiles(s) {
+  const t = (val, label, cls = '') => `<div class="stat ${cls}"><b>${val}</b><span>${label}</span></div>`;
+  return `<div class="stats six">
+    ${t(fmtNum(s.learned), 'kaartjes geleerd')}
+    ${t(fmtNum(s.answers), 'kaartjes gedaan')}
+    ${t(fmtNum(s.sides), 'kanten bekeken')}
+    ${t('🔥 ' + fmtNum(s.streak), 'dagen streak', 'flame')}
+    ${t(fmtNum(s.best_streak), 'langste streak')}
+    ${t(String(s.avg_per_day || 0).replace('.', ','), 'gemiddeld per dag')}
+  </div>`;
+}
+function renderProfile() {
+  const v = view;
+  if (v.loading || !v.data) return backBar('Profiel') + '<p class="muted center">Laden…</p>';
+  const p = v.data.profile;
+  if (!p) return backBar('Profiel') + '<p class="muted center">Dit profiel bestaat niet (meer).</p>';
+  const s = v.data.stats || {};
+  const rel = Cloud.relation(p.id);
+  const since = p.created_at ? new Date(p.created_at).toLocaleDateString('nl-BE', { month: 'long', year: 'numeric' }) : '';
+  let actions = '';
+  if (rel === 'me') {
+    actions = `<div class="btn-row center"><button class="btn sm" data-act="copy-friendlink">Kopieer mijn vriendlink</button><button class="btn sm danger" data-act="logout">Uitloggen</button></div>`;
+  } else if (rel === 'friend') {
+    actions = `<div class="btn-row center">
+      <button class="btn primary sm" data-act="chat" data-uid="${p.id}">Chat</button>
+      ${s.studied_today ? '<span class="pill ok">✓ Vandaag al gestudeerd</span>' : `<button class="btn sm" data-act="remind" data-uid="${p.id}">⏰ Stuur herinnering</button>`}
+      ${v.confirm === 'unfriend' ? `<button class="btn sm danger solid" data-act="unfriend-yes" data-uid="${p.id}">Ja, verwijder</button><button class="btn sm" data-act="confirm-no">Annuleren</button>` : `<button class="btn ghost sm" data-act="ask" data-what="unfriend">Vriend verwijderen</button>`}
+    </div>`;
+  } else if (rel === 'incoming') {
+    const f = Cloud.incoming.find(x => x.id === p.id);
+    actions = `<p class="center">@${esc(p.username)} wil je vriend worden.</p><div class="btn-row center"><button class="btn primary sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="1">Accepteren</button><button class="btn sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="0">Weigeren</button></div>`;
+  } else if (rel === 'outgoing') {
+    actions = `<div class="btn-row center"><span class="pill">Verzoek verstuurd</span><button class="btn ghost sm" data-act="unfriend-yes" data-uid="${p.id}">Intrekken</button></div>`;
+  } else {
+    actions = `<div class="btn-row center"><button class="btn primary sm" data-act="add-friend" data-name="${esc(p.username)}">+ Vriend toevoegen</button></div>`;
+  }
+  let items = '';
+  if (rel !== 'me') {
+    const fl = v.data.folders, dl = v.data.decks;
+    const memberOf = id => decks.some(d => d.ro && d.id === id) || folders.some(f => f.ro && f.id === id);
+    const row = (kind, it, sub) => {
+      const sid = sharedId(p.id, it.id);
+      return `<div class="list-row">${kind === 'folder' ? `<span class="fdot c${(it.color || 0) % FOLDER_COLORS}"></span>` : '<span class="fdot set"></span>'}
+        <div class="grow"><b>${esc(it.name)}</b><span class="muted small">${sub} · ${VIS_SHORT[it.visibility] || ''}</span></div>
+        ${memberOf(sid) ? '<span class="pill ok">Lid ✓</span>' : `<button class="btn sm" data-act="join" data-owner="${p.id}" data-kind="${kind}" data-id="${esc(it.id)}">Lid worden</button>`}</div>`;
+    };
+    const rows = [
+      ...fl.map(f => row('folder', f, `map · ${plural(dl.filter(d => d.folder_id === f.id).length, 'set', 'sets')}`)),
+      ...dl.filter(d => !d.folder_id || !fl.some(f => f.id === d.folder_id)).map(d => row('deck', d, plural(d.card_count, 'kaart', 'kaarten')))
+    ];
+    items = `<p class="section-title">Mappen en sets die jij mag zien</p>${rows.length ? `<div class="list">${rows.join('')}</div>` : '<p class="muted small">Nog niets gedeeld met jou of openbaar.</p>'}`;
+  }
+  return backBar(rel === 'me' ? 'Mijn profiel' : 'Profiel') + `<section class="panel">
+    <div class="profile-head">${avatar(p.username, true)}<div><h2>@${esc(p.username)}</h2><p class="muted small">${since ? 'Lid sinds ' + since : ''}${s.active_days ? ` · ${plural(s.active_days, 'dag', 'dagen')} gestudeerd` : ''}</p></div></div>
+    ${actions}
+    ${statTiles(s)}
+    ${rel === 'me' ? '<p class="muted small center">Iedereen met een account kan deze statistieken zien.</p>' : ''}
+    ${items}
+  </section>`;
+}
+
+/* ---------- Friends ---------- */
+let searchT;
+function renderFriends() {
+  const tab = view.tab || 'friends';
+  const tabBtn = (k, t) => `<button role="tab" aria-selected="${tab === k}" data-act="friends" data-tab="${k}">${t}</button>`;
+  let body = '';
+  if (tab === 'friends') {
+    body = Cloud.friends.length ? `<div class="list">${Cloud.friends.map(f => `<div class="list-row">
+        <button class="row-main" data-act="profile" data-uid="${f.id}">${avatar(f.username)}<b>@${esc(f.username)}</b></button>
+        <button class="btn sm" data-act="chat" data-uid="${f.id}">Chat</button></div>`).join('')}</div>`
+      : `<div class="empty"><p class="muted">Je hebt nog geen vrienden. Zoek ze op gebruikersnaam of stuur je vriendlink.</p><button class="btn primary" data-act="friends" data-tab="search">Vrienden zoeken</button></div>`;
+  } else if (tab === 'requests') {
+    const inc = Cloud.incoming.map(f => `<div class="list-row"><button class="row-main" data-act="profile" data-uid="${f.id}">${avatar(f.username)}<b>@${esc(f.username)}</b></button>
+      <button class="btn primary sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="1">Accepteren</button><button class="btn sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="0">Weigeren</button></div>`).join('');
+    const out = Cloud.outgoing.map(f => `<div class="list-row"><button class="row-main" data-act="profile" data-uid="${f.id}">${avatar(f.username)}<b>@${esc(f.username)}</b></button>
+      <span class="muted small">wacht op antwoord</span><button class="btn ghost sm" data-act="unfriend-yes" data-uid="${f.id}">Intrekken</button></div>`).join('');
+    body = `<p class="section-title">Ontvangen</p>${inc ? `<div class="list">${inc}</div>` : '<p class="muted small">Geen nieuwe verzoeken.</p>'}
+      <p class="section-title">Verstuurd</p>${out ? `<div class="list">${out}</div>` : '<p class="muted small">Geen openstaande verzoeken.</p>'}`;
+  } else {
+    const d = view.data || {};
+    const personRow = (p, sub) => {
+      const rel = Cloud.relation(p.id);
+      const btn = rel === 'friend' ? '<span class="pill ok">Vriend ✓</span>' : rel === 'outgoing' ? '<span class="pill">Verstuurd</span>'
+        : rel === 'incoming' ? `<button class="btn primary sm" data-act="add-friend" data-name="${esc(p.username)}">Accepteren</button>`
+        : rel === 'me' ? '<span class="pill">Jij</span>' : `<button class="btn sm" data-act="add-friend" data-name="${esc(p.username)}">+ Toevoegen</button>`;
+      return `<div class="list-row"><button class="row-main" data-act="profile" data-uid="${p.id}">${avatar(p.username)}<span class="grow"><b>@${esc(p.username)}</b>${sub ? `<span class="muted small">${sub}</span>` : ''}</span></button>${btn}</div>`;
+    };
+    body = `<div class="card-box">
+        <label class="lbl" for="f-search">Zoek op gebruikersnaam</label>
+        <input class="field" id="f-search" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="bv. lisa" value="${esc(view.q || '')}">
+        <div id="search-results">${(d.results || []).map(p => personRow(p)).join('') || (view.q ? '<p class="muted small">Niemand gevonden.</p>' : '')}</div>
+      </div>
+      <div class="card-box"><p class="lbl">Jouw vriendlink</p><p class="help" style="margin-top:0">Stuur deze link via WhatsApp of Instagram. Wie hem opent, kan je meteen toevoegen.</p>
+        <div class="btn-row"><button class="btn sm primary" data-act="share-friendlink">Deel mijn vriendlink</button><button class="btn sm" data-act="copy-friendlink">Kopieer</button></div></div>
+      <p class="section-title">Aanbevolen voor jou</p>
+      ${d.suggested ? (d.suggested.length ? `<div class="list">${d.suggested.map(p => personRow(p, plural(p.mutual, 'gemeenschappelijke vriend', 'gemeenschappelijke vrienden'))).join('')}</div>` : '<p class="muted small">Nog geen aanbevelingen. Zodra je vrienden hebt, zie je hier hun vrienden.</p>') : '<p class="muted small">Laden…</p>'}
+      <p class="section-title">Mensen met openbare sets</p>
+      ${d.creators ? (d.creators.length ? `<div class="list">${d.creators.map(p => personRow(p, plural(p.items, 'openbare map of set', 'openbare mappen en sets'))).join('')}</div>` : '<p class="muted small">Nog niemand.</p>') : ''}`;
+  }
+  return backBar('Vrienden') + `<section class="panel">
+    <div class="tabs" role="tablist">${tabBtn('friends', `Vrienden (${Cloud.friends.length})`)}${tabBtn('requests', `Verzoeken${Cloud.incoming.length ? ` (${Cloud.incoming.length})` : ''}`)}${tabBtn('search', 'Zoeken')}</div>
+    ${body}</section>`;
+}
+async function loadSuggestions() {
+  const v = view;
+  const [a, b] = await Promise.all([Cloud.sb.rpc('suggested_friends'), Cloud.sb.rpc('public_creators')]);
+  if (view !== v) return;
+  view.data = { ...(view.data || {}), suggested: a.data || [], creators: b.data || [] };
+  render(); const i = document.getElementById('f-search'); if (i && view.q) { i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+}
+function searchPeople(q) {
+  view.q = q; clearTimeout(searchT);
+  searchT = setTimeout(async () => {
+    const t = q.trim().toLowerCase().replace(/[^a-z0-9_.]/g, '');
+    let results = [];
+    if (t) { const { data } = await Cloud.sb.from('profiles').select('id,username').ilike('username', t + '%').order('username').limit(20); results = data || []; }
+    if (view.name !== 'friends') return;
+    view.data = { ...(view.data || {}), results };
+    const box = document.getElementById('search-results');
+    if (box) { const html = renderFriends(); const tmp = document.createElement('div'); tmp.innerHTML = html; const nb = tmp.querySelector('#search-results'); if (nb) box.innerHTML = nb.innerHTML; }
+  }, 300);
+}
+async function shareText(title, text, url) {
+  if (navigator.share) { try { await navigator.share({ title, text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  copyText(url);
+}
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); toast('Gekopieerd'); }
+  catch (e) { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); toast('Gekopieerd'); } catch (e2) { toast(t); } ta.remove(); }
+}
+
+/* ---------- Notifications ---------- */
+function notifText(n, who) {
+  const d = n.data || {};
+  const what = d.kind === 'folder' ? 'de map' : 'de set';
+  switch (n.type) {
+    case 'friend_request': return `<b>@${esc(who)}</b> wil je vriend worden`;
+    case 'friend_accepted': return `<b>@${esc(who)}</b> heeft je vriendschapsverzoek geaccepteerd`;
+    case 'invite': return `<b>@${esc(who)}</b> nodigt je uit voor ${what} <b>${esc(d.name)}</b>`;
+    case 'invite_accepted': return `<b>@${esc(who)}</b> is lid geworden van ${what} <b>${esc(d.name)}</b>`;
+    case 'member_joined': return `<b>@${esc(who)}</b> is lid geworden van ${what} <b>${esc(d.name)}</b>`;
+    case 'reminder': return `<b>@${esc(who)}</b> herinnert je eraan om vandaag te studeren 📚`;
+    case 'comment': return `<b>@${esc(who)}</b> gaf een opmerking op <b>${esc(d.name)}</b>: “${esc(d.body)}”`;
+    case 'suggestion': return `<b>@${esc(who)}</b> stelt een aanpassing voor in <b>${esc(d.name)}</b>: “${esc(d.body)}”`;
+    default: return `Nieuwe melding van <b>@${esc(who)}</b>`;
+  }
+}
+const Notifs = {
+  async open() { view = { name: 'notifs', loading: true }; render(); scrollTo(0, 0); await this.load(); },
+  async load() {
+    const v = view;
+    const { data } = await Cloud.sb.from('notifications').select('id,type,actor,data,created_at,read_at').order('created_at', { ascending: false }).limit(60);
+    const list = data || [];
+    await Cloud.names(list.map(n => n.actor));
+    const invIds = list.filter(n => n.type === 'invite').map(n => n.data && n.data.invite_id).filter(Boolean);
+    const inv = {};
+    if (invIds.length) { const r = await Cloud.sb.from('invites').select('id,status').in('id', invIds); (r.data || []).forEach(i => { inv[i.id] = i.status; }); }
+    if (view !== v && view.name !== 'notifs') return;
+    view.loading = false; view.data = { list, inv };
+    render();
+    if (list.some(n => !n.read_at)) { await Cloud.sb.rpc('mark_notifications_read'); Cloud.unreadNotif = 0; updateBadges(); }
+  }
+};
+function renderNotifs() {
+  if (view.loading || !view.data) return backBar('Meldingen') + '<p class="muted center">Laden…</p>';
+  const { list, inv } = view.data;
+  const rows = list.map(n => {
+    const who = Cloud.nameCache[n.actor] || 'iemand';
+    const d = n.data || {};
+    let act = '';
+    if (n.type === 'friend_request') {
+      const f = Cloud.incoming.find(x => x.fid === d.friendship_id);
+      act = f ? `<button class="btn primary sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="1">Accepteren</button><button class="btn sm" data-act="friend-respond" data-fid="${f.fid}" data-yes="0">Weigeren</button>`
+        : (Cloud.relation(n.actor) === 'friend' ? '<span class="pill ok">Vrienden ✓</span>' : '');
+    } else if (n.type === 'invite') {
+      const st = inv[d.invite_id];
+      act = st === 'pending' ? `<button class="btn primary sm" data-act="invite-respond" data-iid="${d.invite_id}" data-yes="1">Accepteren</button><button class="btn sm" data-act="invite-respond" data-iid="${d.invite_id}" data-yes="0">Weigeren</button>`
+        : st === 'accepted' ? '<span class="pill ok">Geaccepteerd ✓</span>' : st === 'declined' ? '<span class="pill">Geweigerd</span>' : '';
+    } else if (n.type === 'reminder') {
+      act = '<button class="btn primary sm" data-act="home">Nu oefenen</button>';
+    } else if ((n.type === 'comment' || n.type === 'suggestion') && d.item_id) {
+      act = `<button class="btn sm" data-act="open-item" data-kind="${esc(d.kind)}" data-id="${esc(d.item_id)}">Bekijk</button>`;
+    } else if ((n.type === 'invite_accepted' || n.type === 'member_joined') && d.item_id) {
+      act = `<button class="btn sm" data-act="open-item" data-kind="${esc(d.kind)}" data-id="${esc(d.item_id)}">Leden bekijken</button>`;
+    }
+    return `<div class="notif${n.read_at ? '' : ' unread'}">
+      <button class="row-main" data-act="profile" data-uid="${n.actor}">${avatar(who)}</button>
+      <div class="grow"><p>${notifText(n, who)}</p><span class="muted small">${timeAgo(n.created_at)}</span>${act ? `<div class="btn-row">${act}</div>` : ''}</div></div>`;
+  }).join('');
+  return backBar('Meldingen') + `<section class="panel">${rows ? `<div class="list">${rows}</div>` : '<div class="empty"><p class="muted">Nog geen meldingen. Hier zie je vriendschapsverzoeken, uitnodigingen, herinneringen en opmerkingen.</p></div>'}</section>`;
+}
+
+/* ---------- Chat ---------- */
+const Chat = {
+  async openList() { view = { name: 'chats', loading: true }; render(); scrollTo(0, 0); await this.loadList(); },
+  async loadList() {
+    const v = view;
+    const uid = Cloud.user.id;
+    const { data } = await Cloud.sb.from('messages').select('id,from_user,to_user,kind,body,created_at,read_at').order('created_at', { ascending: false }).limit(300);
+    const by = new Map();
+    for (const m of data || []) {
+      const other = m.from_user === uid ? m.to_user : m.from_user;
+      const e = by.get(other) || { id: other, last: m, unread: 0 };
+      if (m.to_user === uid && !m.read_at) e.unread++;
+      by.set(other, e);
+    }
+    Cloud.friends.forEach(f => { if (!by.has(f.id)) by.set(f.id, { id: f.id, last: null, unread: 0 }); });
+    await Cloud.names([...by.keys()]);
+    if (view !== v && view.name !== 'chats') return;
+    view.loading = false; view.data = [...by.values()];
+    render();
+  },
+  async open(uid) {
+    view = { name: 'chat', uid, loading: true, draft: '' }; render();
+    const v = view, me = Cloud.user.id;
+    const [r] = await Promise.all([
+      Cloud.sb.from('messages').select('id,from_user,to_user,kind,body,invite_id,created_at,read_at')
+        .or(`and(from_user.eq.${me},to_user.eq.${uid}),and(from_user.eq.${uid},to_user.eq.${me})`)
+        .order('created_at', { ascending: true }).limit(300),
+      Cloud.names([uid])
+    ]);
+    const msgs = r.data || [];
+    const inv = await this.invites(msgs);
+    if (view !== v) return;
+    view.loading = false; view.data = { msgs, inv };
+    render(); this.scrollEnd();
+    if (msgs.some(m => m.to_user === me && !m.read_at)) { await Cloud.sb.rpc('mark_chat_read', { p_other: uid }); Cloud.refreshCounts(); }
+  },
+  async invites(msgs) {
+    const ids = msgs.filter(m => m.invite_id).map(m => m.invite_id);
+    const inv = {};
+    if (ids.length) { const r = await Cloud.sb.from('invites').select('id,status,kind,item_name,color,from_user,to_user').in('id', ids); (r.data || []).forEach(i => { inv[i.id] = i; }); }
+    return inv;
+  },
+  bubble(m, inv) {
+    const mine = m.from_user === Cloud.user.id;
+    const who = Cloud.nameCache[m.from_user] || '';
+    const time = `<span class="time">${new Date(m.created_at).toLocaleTimeString('nl-BE', { hour: '2-digit', minute: '2-digit' })}</span>`;
+    if (m.kind === 'invite') {
+      const i = inv[m.invite_id] || {};
+      const what = i.kind === 'deck' ? 'set' : 'map';
+      const act = !mine && i.status === 'pending'
+        ? `<div class="btn-row"><button class="btn primary sm" data-act="invite-respond" data-iid="${m.invite_id}" data-yes="1">Accepteren</button><button class="btn sm" data-act="invite-respond" data-iid="${m.invite_id}" data-yes="0">Weigeren</button></div>`
+        : `<span class="pill${i.status === 'accepted' ? ' ok' : ''}">${i.status === 'accepted' ? 'Geaccepteerd ✓' : i.status === 'declined' ? 'Geweigerd' : 'Wacht op antwoord'}</span>`;
+      return `<div class="msg ${mine ? 'mine' : ''}"><div class="invite-card"><span class="fdot ${i.kind === 'deck' ? 'set' : 'c' + ((i.color || 0) % FOLDER_COLORS)}"></span>
+        <div><p class="small muted">${mine ? 'Je deelde een ' + what : '@' + esc(who) + ' deelt een ' + what + ' met je'}</p><b>${esc(i.item_name || m.body)}</b>
+        <p class="small muted">${mine ? '' : 'Je wordt lid: alleen @' + esc(who) + ' kan hem bewerken.'}</p>${act}</div></div>${time}</div>`;
+    }
+    if (m.kind === 'reminder') {
+      return `<div class="msg ${mine ? 'mine' : ''}"><div class="bubble reminder">⏰ ${mine ? 'Je stuurde een herinnering om te studeren' : '@' + esc(who) + ' herinnert je eraan om vandaag te studeren!'}</div>${time}</div>`;
+    }
+    return `<div class="msg ${mine ? 'mine' : ''}"><div class="bubble">${esc(m.body)}</div>${time}</div>`;
+  },
+  receive(m) {
+    if (!view.data) return;
+    view.data.msgs.push(m);
+    const finish = async () => {
+      if (m.invite_id) Object.assign(view.data.inv, await this.invites([m]));
+      const box = document.getElementById('chat-msgs');
+      if (box) { box.insertAdjacentHTML('beforeend', this.bubble(m, view.data.inv)); this.scrollEnd(); }
+    };
+    finish();
+  },
+  scrollEnd() { const b = document.getElementById('chat-msgs'); if (b) b.scrollTop = b.scrollHeight; },
+  async send() {
+    const input = document.getElementById('chat-input');
+    const body = (input && input.value || '').trim(); if (!body) return;
+    input.value = ''; view.draft = '';
+    const { data, error } = await Cloud.sb.from('messages').insert({ from_user: Cloud.user.id, to_user: view.uid, body }).select().single();
+    if (error) { toast(Cloud.relation(view.uid) === 'friend' ? 'Versturen lukte niet. Probeer opnieuw.' : 'Je kunt alleen chatten met vrienden.'); input.value = body; return; }
+    this.receive(data);
+  }
+};
+function renderChats() {
+  if (view.loading || !view.data) return backBar('Chat') + '<p class="muted center">Laden…</p>';
+  const rows = view.data.map(c => {
+    const name = Cloud.nameCache[c.id] || '';
+    const l = c.last;
+    const snippet = !l ? 'Nog geen berichten' : l.kind === 'invite' ? '📁 ' + l.body : l.kind === 'reminder' ? '⏰ Herinnering om te studeren' : l.body;
+    return `<button class="chat-row" data-act="chat" data-uid="${c.id}">${avatar(name)}<span class="grow"><b>@${esc(name)}</b><span class="muted small one-line">${esc(snippet)}</span></span>
+      <span class="chat-meta">${l ? `<span class="muted small">${timeAgo(l.created_at)}</span>` : ''}${c.unread ? `<span class="badge static">${c.unread}</span>` : ''}</span></button>`;
+  }).join('');
+  return backBar('Chat') + `<section class="panel">${rows ? `<div class="list">${rows}</div>` : `<div class="empty"><p class="muted">Voeg eerst vrienden toe om te chatten.</p><button class="btn primary" data-act="friends" data-tab="search">Vrienden zoeken</button></div>`}</section>`;
+}
+function renderChat() {
+  const uid = view.uid, name = Cloud.nameCache[uid] || '';
+  const head = `<header class="bar"><button class="icon-btn" data-act="chats" aria-label="Terug">←</button>
+    <button class="row-main title-btn" data-act="profile" data-uid="${uid}">${avatar(name)}<b>@${esc(name)}</b></button>
+    <button class="btn sm" data-act="share-pick" aria-label="Map of set delen">📁 Delen</button></header>`;
+  if (view.loading || !view.data) return head + '<p class="muted center">Laden…</p>';
+  const friend = Cloud.relation(uid) === 'friend';
+  const picker = view.picking ? `<div class="card-box picker"><p class="lbl">Welke map of set deel je met @${esc(name)}?</p>
+      <p class="help" style="margin-top:0">@${esc(name)} wordt lid. Jij blijft eigenaar en alleen jij kan bewerken.</p>
+      ${folders.filter(f => !f.ro).map(f => `<button class="pick-row" data-act="invite" data-kind="folder" data-id="${f.id}" data-uid="${uid}"><span class="fdot c${(f.c || 0) % FOLDER_COLORS}"></span>${esc(f.name)}<span class="muted small">map</span></button>`).join('')}
+      ${decks.filter(d => !d.ro).map(d => `<button class="pick-row" data-act="invite" data-kind="deck" data-id="${d.id}" data-uid="${uid}"><span class="fdot set"></span>${esc(d.name)}<span class="muted small">${plural(d.cards.length, 'kaart', 'kaarten')}</span></button>`).join('') || ''}
+      <button class="btn ghost sm" data-act="share-pick">Sluiten</button></div>` : '';
+  return head + `<div class="chat">
+    ${picker}
+    <div class="chat-msgs" id="chat-msgs">${view.data.msgs.map(m => Chat.bubble(m, view.data.inv)).join('') || '<p class="muted center small">Zeg hallo 👋</p>'}</div>
+    ${friend ? `<form class="composer" data-form="chat"><input class="field" id="chat-input" autocomplete="off" placeholder="Bericht…" value="${esc(view.draft || '')}" maxlength="2000"><button class="btn primary" type="submit">Stuur</button></form>`
+      : '<p class="muted small center">Jullie zijn (nog) geen vrienden, dus je kunt geen berichten sturen.</p>'}
+  </div>`;
+}
+
+/* ---------- Sharing settings per folder / set ---------- */
+function itemOf(kind, id) { return kind === 'folder' ? getFolder(id) : getDeck(id); }
+function openItem(kind, id) {
+  const obj = itemOf(kind, id);
+  if (!obj) { toast('Deze map of set staat niet (meer) in je app.'); return; }
+  view = { name: 'item', kind, id }; render(); scrollTo(0, 0);
+  if (Cloud.user) loadItem();
+}
+async function loadItem() {
+  const v = view; const obj = itemOf(v.kind, v.id); if (!obj || !Cloud.user) return;
+  const owner = obj.ro ? obj.owner : Cloud.user.id, src = obj.ro ? obj.srcId : obj.id;
+  const ids = [src];
+  if (v.kind === 'folder') decks.filter(d => d.folder === obj.id).forEach(d => ids.push(d.ro ? d.srcId : d.id));
+  const [ms, cm] = await Promise.all([
+    Cloud.sb.from('memberships').select('member,joined_at').eq('owner', owner).eq('kind', v.kind).eq('item_id', src),
+    Cloud.sb.from('comments').select('id,author,body,is_suggestion,status,card_id,item_id,kind,created_at').eq('owner', owner).in('item_id', ids).order('created_at', { ascending: false }).limit(100)
+  ]);
+  const members = (ms.data || []).map(m => m.member);
+  await Cloud.names([owner, ...members, ...(cm.data || []).map(c => c.author)]);
+  if (view !== v) return;
+  view.data = { ...(view.data || {}), owner, src, members, comments: cm.data || [] };
+  Cloud.members[owner + '|' + v.kind + '|' + src] = members;
+  render();
+}
+function payloadOf(kind, obj) {
+  const deckP = d => ({ name: d.name, n: d.n, names: d.names.slice(0, d.n), langs: (d.langs || []).slice(0, d.n), opt: d.opt, cards: d.cards.map(c => c.s.slice(0, d.n)) });
+  if (kind === 'folder') return { type: 'folder', name: obj.name, c: obj.c || 0, decks: decks.filter(d => d.folder === obj.id).map(deckP) };
+  return { type: 'deck', deck: deckP(obj) };
+}
+function renderItem() {
+  const v = view, isF = v.kind === 'folder', obj = itemOf(v.kind, v.id);
+  if (!obj) { view = { name: 'home', folder: homeFolder }; return renderHome(); }
+  const title = (isF ? 'Map' : 'Set') + ': ' + esc(obj.name);
+  if (!Cloud.user) {
+    return backBar(title, isF ? 'open-folder-back' : 'home') + `<section class="panel"><div class="empty"><p class="muted">Log in om deze ${isF ? 'map' : 'set'} te delen met vrienden of openbaar te zetten.</p>
+      <button class="btn primary" data-act="auth">Inloggen of account maken</button></div></section>`;
+  }
+  const d = v.data || {};
+  const own = !obj.ro;
+  const owner = own ? Cloud.user.id : obj.owner;
+  const members = d.members || [];
+  const total = members.length + 1;
+  const chip = (uid, removable) => `<span class="member-chip">${avatar(Cloud.nameCache[uid])}<button class="link-btn" data-act="profile" data-uid="${uid}">@${esc(Cloud.nameCache[uid] || '…')}</button>${removable ? `<button class="x" data-act="remove-member" data-uid="${uid}" aria-label="Verwijder @${esc(Cloud.nameCache[uid] || '')}">×</button>` : ''}</span>`;
+  const membersBox = `<div class="card-box"><p class="lbl">👥 ${plural(total, 'lid', 'leden')}</p>
+    <div class="chips">${chip(owner, false)}<span class="pill">eigenaar</span>${members.map(m => chip(m, own)).join('')}</div>
+    ${d.members ? '' : '<p class="muted small">Laden…</p>'}</div>`;
+  let ownBoxes = '';
+  if (own) {
+    const vis = obj.vis || 'private';
+    const parent = !isF && obj.folder ? getFolder(obj.folder) : null;
+    const friendsList = Cloud.friends.length
+      ? Cloud.friends.map(f => `<div class="list-row"><span class="row-main">${avatar(f.username)}<b>@${esc(f.username)}</b></span>${members.includes(f.id) ? '<span class="pill ok">Lid ✓</span>' : `<button class="btn sm" data-act="invite" data-kind="${v.kind}" data-id="${obj.id}" data-uid="${f.id}">Uitnodigen</button>`}</div>`).join('')
+      : '<p class="muted small">Je hebt nog geen vrienden. <button class="link-btn" data-act="friends" data-tab="search">Vrienden zoeken</button></p>';
+    ownBoxes = `<div class="card-box"><p class="lbl">Wie mag dit zien?</p>
+        <div class="seg" role="radiogroup" aria-label="Zichtbaarheid">${['private', 'friends', 'public'].map(k => `<button role="radio" aria-checked="${vis === k}" data-act="set-vis" data-v="${k}">${VIS_SHORT[k]}</button>`).join('')}</div>
+        <p class="help" style="margin-top:0">${vis === 'private' ? 'Alleen jij en de leden die je uitnodigt.' : vis === 'friends' ? 'Al je vrienden zien dit op je profiel en kunnen lid worden.' : 'Iedereen met een account ziet dit op je profiel en kan lid worden.'}</p>
+        ${parent && (parent.vis || 'private') !== 'private' ? `<p class="help ok" style="margin-top:0">Deze set zit in de map “${esc(parent.name)}” die op ${VIS[parent.vis]} staat, dus ze is minstens zo zichtbaar.</p>` : ''}
+      </div>
+      <div class="card-box"><p class="lbl">Delen met een vriend</p><p class="help" style="margin-top:0">Je vriend krijgt een uitnodiging in de chat en wordt lid. Alleen jij kan bewerken; leden kunnen opmerkingen en voorstellen sturen.</p>${friendsList}</div>
+      <div class="card-box"><p class="lbl">Deellink (kopie)</p><p class="help" style="margin-top:0">Iedereen met deze link kan een eigen kopie toevoegen, ook zonder account.</p>
+        ${d.link ? `<input class="field" readonly value="${esc(d.link)}" id="share-link"><div class="btn-row"><button class="btn sm primary" data-act="share-link">Delen</button><button class="btn sm" data-act="copy-link">Kopieer</button></div>`
+          : '<button class="btn sm" data-act="make-link">Maak deellink</button>'}</div>`;
+  }
+  const comments = d.comments || [];
+  const deckName = itemId => { const x = decks.find(dd => (dd.ro ? dd.srcId : dd.id) === itemId && (dd.ro ? dd.owner === owner : true)); return x ? x.name : ''; };
+  const cardText = (itemId, cardId) => { const x = decks.find(dd => (dd.ro ? dd.srcId : dd.id) === itemId); const c = x && x.cards.find(cc => cc.id === cardId); return c ? c.s[0] : ''; };
+  const commentRow = c => `<div class="comment ${c.status}">
+      <p class="small"><b>@${esc(Cloud.nameCache[c.author] || '')}</b> · ${c.is_suggestion ? '<span class="pill warn">voorstel</span>' : '<span class="pill">opmerking</span>'} · <span class="muted">${timeAgo(c.created_at)}</span>
+      ${c.item_id !== d.src ? ` · <span class="muted">set “${esc(deckName(c.item_id))}”</span>` : ''}${c.card_id ? ` · <span class="muted">kaart “${esc(cardText(c.item_id, c.card_id))}”</span>` : ''}</p>
+      <p>${esc(c.body)}</p>
+      ${own ? `<div class="btn-row">${c.status === 'open' ? `<button class="btn sm primary" data-act="comment-status" data-cid="${c.id}" data-st="done">✓ Gedaan</button><button class="btn sm" data-act="comment-status" data-cid="${c.id}" data-st="dismissed">Negeren</button>` : `<span class="pill">${c.status === 'done' ? 'gedaan ✓' : 'genegeerd'}</span><button class="btn ghost sm" data-act="comment-status" data-cid="${c.id}" data-st="open">Heropen</button>`}<button class="btn ghost sm" data-act="comment-del" data-cid="${c.id}">Verwijder</button></div>`
+        : `<span class="pill">${c.status === 'open' ? 'verstuurd' : c.status === 'done' ? 'eigenaar: gedaan ✓' : 'eigenaar: genegeerd'}</span>`}
+    </div>`;
+  const commentsBox = own
+    ? `<div class="card-box"><p class="lbl">Opmerkingen en voorstellen van leden (${comments.filter(c => c.status === 'open').length} open)</p>
+        ${comments.length ? comments.map(commentRow).join('') : '<p class="muted small">Nog niets ontvangen. Alleen jij ziet wat leden hier sturen.</p>'}</div>`
+    : `<form class="card-box" data-form="comment"><p class="lbl">Opmerking of aanpassing voorstellen</p>
+        <p class="help" style="margin-top:0">Alleen @${esc(obj.ownerName || '')} (de eigenaar) ziet dit, in zijn meldingen en hier.</p>
+        <textarea class="field small-ta" id="c-body" maxlength="2000" placeholder="bv. Bij “correr” klopt de zin niet: …" required></textarea>
+        <label class="check"><input type="checkbox" id="c-sugg" checked> Dit is een voorgestelde aanpassing</label>
+        <button class="btn primary sm" type="submit">Versturen</button>
+        ${comments.length ? '<p class="lbl" style="margin-top:6px">Wat jij al stuurde</p>' + comments.map(commentRow).join('') : ''}</form>`;
+  const memberBoxes = own ? '' : `${isF ? `<div class="card-box"><p class="lbl">Mijn kleur voor deze map</p>${swatches((obj.c || 0) % FOLDER_COLORS)}</div>` : ''}
+    <div class="card-box danger-zone"><p class="lbl">${isF ? 'Map' : 'Set'} verlaten</p><p class="help" style="margin-top:0">Je bent geen lid meer en ${isF ? 'de map verdwijnt' : 'de set verdwijnt'} uit je app.</p>
+      ${v.confirm === 'leave' ? '<div class="btn-row"><button class="btn sm danger solid" data-act="leave-yes">Ja, verlaten</button><button class="btn sm" data-act="confirm-no">Annuleren</button></div>' : '<button class="btn sm danger" data-act="ask" data-what="leave">Verlaten</button>'}</div>`;
+  const back = isF ? 'open-folder-back' : 'home';
+  return backBar(title, back) + `<section class="panel">
+    <p class="muted">${own ? 'Jij bent de eigenaar.' : `Gedeeld door <button class="link-btn" data-act="profile" data-uid="${obj.owner}">@${esc(obj.ownerName || '')}</button>. Jij bent lid: je oefent met je eigen voortgang.`}</p>
+    ${membersBox}${ownBoxes}${commentsBox}${memberBoxes}
+  </section>`;
+}
+
+/* ---------- Share link (copy) ---------- */
+async function loadLink() {
+  const v = view;
+  if (!Cloud.sb) { view.error = 'Geen verbinding.'; render(); return; }
+  const { data, error } = await Cloud.sb.rpc('get_share_link', { t: v.token });
+  if (view !== v) return;
+  view.data = data && data[0]; view.error = error ? 'Deze link werkt niet.' : (!view.data ? 'Deze link bestaat niet (meer).' : '');
+  render();
+}
+function renderLink() {
+  if (!view.data && !view.error) return backBar('Gedeelde link') + '<p class="muted center">Laden…</p>';
+  if (view.error) return backBar('Gedeelde link') + `<section class="panel"><div class="empty"><p class="muted">${esc(view.error)}</p><button class="btn" data-act="home">Naar mijn sets</button></div></section>`;
+  const l = view.data, p = l.payload || {};
+  const dl = p.type === 'folder' ? p.decks || [] : [p.deck].filter(Boolean);
+  const cards = dl.reduce((a, d) => a + (d.cards || []).length, 0);
+  return backBar('Gedeelde link') + `<section class="panel"><div class="card-box center">
+    ${avatar(l.username, true)}
+    <p><b>@${esc(l.username)}</b> deelt ${p.type === 'folder' ? 'de map' : 'de set'}</p>
+    <h2>${esc(l.item_name)}</h2>
+    <p class="muted">${p.type === 'folder' ? plural(dl.length, 'set', 'sets') + ' · ' : ''}${plural(cards, 'kaart', 'kaarten')}</p>
+    <button class="btn primary block" data-act="import-link">Toevoegen aan mijn app</button>
+    <p class="muted small">Je krijgt een eigen kopie die je zelf kunt aanpassen.</p></div></section>`;
+}
+function importPayload(p) {
+  const addDeck = (x, folderId) => {
+    const d = makeDeck(x.name, x.n || 2, (x.names || DEFAULT_NAMES).slice(0, x.n || 2), (x.cards || []).map(s => Array.from({ length: x.n || 2 }, (_, i) => s[i] || '')));
+    if (Array.isArray(x.langs)) d.langs = x.langs.slice(0, d.n);
+    if (x.opt) d.opt = { ...d.opt, ...x.opt };
+    d.folder = folderId || ''; decks.push(d); Store.touch(d); return d;
+  };
+  if (p.type === 'folder') { const f = createFolder(p.name || 'Gedeelde map', p.c); (p.decks || []).forEach(x => addDeck(x, f.id)); homeFolder = f.id; return f.name; }
+  if (p.deck) { addDeck(p.deck, ''); return p.deck.name; }
+  return '';
+}
+function handleHash() {
+  if (!ONLINE) return false;
+  const m = location.hash.match(/^#(link|friend)=([A-Za-z0-9_.\-]+)$/);
+  if (!m) return false;
+  history.replaceState(null, '', location.pathname + location.search);
+  if (m[1] === 'link') { view = { name: 'link', token: m[2] }; render(); loadLink(); return true; }
+  if (Cloud.user) { openProfileByName(m[2]); return true; }
+  view = { name: 'auth', mode: 'signup', pendingFriend: m[2], error: '' }; render(); return true;
+}
+
+/* ---------- Online actions ---------- */
+const needLogin = () => { if (Cloud.user) return false; view = { name: 'auth', mode: 'login' }; render(); return true; };
+Object.assign(ACT, {
+  auth(el) { view = { name: 'auth', mode: el.dataset.mode || 'login', pendingFriend: view.pendingFriend }; render(); scrollTo(0, 0); },
+  async logout() { await Cloud.signOut(); view = { name: 'home' }; homeFolder = null; render(); toast('Je bent uitgelogd. Je sets staan veilig in je account.'); },
+  profile(el) { if (needLogin()) return; openProfile(el.dataset.uid); },
+  friends(el) {
+    if (needLogin()) return;
+    view = { name: 'friends', tab: el.dataset.tab || (view.name === 'friends' ? view.tab : 'friends'), data: view.name === 'friends' ? view.data : null, q: view.name === 'friends' ? view.q : '' };
+    render(); scrollTo(0, 0);
+    if (view.tab === 'search' && !(view.data && view.data.suggested)) loadSuggestions();
+    Cloud.refreshSocial().then(() => { if (view.name === 'friends') softRender(); });
+  },
+  notifs() { if (needLogin()) return; Notifs.open(); },
+  chats() { if (needLogin()) return; Chat.openList(); },
+  chat(el) { if (needLogin()) return; Chat.open(el.dataset.uid); },
+  'share-pick'() { view.picking = !view.picking; render(); },
+  async 'add-friend'(el) {
+    const { data, error } = await Cloud.sb.rpc('send_friend_request', { p_target: el.dataset.name });
+    const msg = { sent: 'Vriendschapsverzoek verstuurd', accepted: 'Jullie zijn nu vrienden 🎉', already_friends: 'Jullie zijn al vrienden', already_sent: 'Je stuurde al een verzoek', not_found: 'Deze gebruiker bestaat niet', self: 'Dat ben jij 🙂' };
+    toast(error ? 'Lukte niet. Probeer opnieuw.' : (msg[data] || 'Klaar'));
+    await Cloud.refreshSocial(); softRender();
+  },
+  async 'friend-respond'(el) {
+    const yes = el.dataset.yes === '1';
+    await Cloud.sb.rpc('respond_friend', { p_id: +el.dataset.fid, p_accept: yes });
+    toast(yes ? 'Jullie zijn nu vrienden 🎉' : 'Verzoek geweigerd');
+    await Cloud.refreshSocial();
+    if (view.name === 'notifs') render(); else softRender();
+  },
+  async 'unfriend-yes'(el) {
+    await Cloud.sb.rpc('remove_friend', { p_other: el.dataset.uid });
+    view.confirm = null; await Cloud.refreshSocial(); render(); toast('Verwijderd');
+  },
+  async remind(el) {
+    const { data, error } = await Cloud.sb.rpc('send_reminder', { p_to: el.dataset.uid, p_today: dayStr() });
+    const msg = { sent: 'Herinnering verstuurd ⏰', already_studied: 'Je vriend heeft vandaag al gestudeerd 💪', already_sent: 'Je stuurde de laatste 12 uur al een herinnering', not_friends: 'Dit kan alleen bij vrienden' };
+    toast(error ? 'Lukte niet. Probeer opnieuw.' : (msg[data] || 'Klaar'));
+  },
+  'copy-friendlink'() { copyText(appUrl() + '#friend=' + Cloud.me.username); },
+  'share-friendlink'() { shareText('Luca Flashcards', `Voeg me toe als vriend op Luca Flashcards: @${Cloud.me.username}`, appUrl() + '#friend=' + Cloud.me.username); },
+  async join(el) {
+    const { data, error } = await Cloud.sb.rpc('join_item', { p_owner: el.dataset.owner, p_kind: el.dataset.kind, p_item: el.dataset.id });
+    if (error || data !== 'joined') { toast(data === 'no_access' ? 'Je hebt geen toegang meer tot deze map of set.' : 'Lukte niet. Probeer opnieuw.'); return; }
+    toast('Je bent nu lid. Je vindt het op je homepage.');
+    await Cloud.loadShared(); render();
+  },
+  async 'invite-respond'(el) {
+    const yes = el.dataset.yes === '1';
+    const { data } = await Cloud.sb.rpc('respond_invite', { p_id: +el.dataset.iid, p_accept: yes });
+    if (yes && data === 'accepted') { toast('Je bent nu lid. Je vindt het op je homepage.'); await Cloud.loadShared(); }
+    else if (!yes) toast('Uitnodiging geweigerd');
+    if (view.name === 'chat') Chat.open(view.uid); else if (view.name === 'notifs') Notifs.load(); else render();
+  },
+  item(el) { openItem(el.dataset.kind, el.dataset.id); },
+  'open-item'(el) { openItem(el.dataset.kind, el.dataset.id); },
+  'open-folder-back'() { const id = view.id; homeFolder = id; view = { name: 'home', folder: id }; render(); },
+  async invite(el) {
+    const kind = el.dataset.kind, obj = itemOf(kind, el.dataset.id); if (!obj) return;
+    el.disabled = true;
+    await Cloud.settle();
+    const { data, error } = await Cloud.sb.rpc('send_invite', { p_to: el.dataset.uid, p_kind: kind, p_item: obj.id });
+    const msg = { sent: 'Uitnodiging verstuurd in de chat 📁', already_member: 'Deze vriend is al lid', already_invited: 'Je nodigde deze vriend al uit', not_friends: 'Dit kan alleen bij vrienden', not_found: 'Even geduld: de map wordt nog opgeslagen. Probeer zo opnieuw.' };
+    toast(error ? 'Lukte niet. Probeer opnieuw.' : (msg[data] || 'Klaar'));
+    if (view.name === 'chat') { view.picking = false; Chat.open(view.uid); } else { el.disabled = false; loadItem(); }
+  },
+  'set-vis'(el) {
+    const obj = itemOf(view.kind, view.id); if (!obj || obj.ro) return;
+    obj.vis = el.dataset.v;
+    if (view.kind === 'folder') { obj.u = Date.now(); Store.touchFolders(); } else Store.touch(obj);
+    render(); toast(VIS[obj.vis]);
+  },
+  async 'make-link'() {
+    const obj = itemOf(view.kind, view.id); if (!obj) return;
+    const { data, error } = await Cloud.sb.from('share_links').insert({ owner: Cloud.user.id, kind: view.kind, item_name: obj.name, payload: payloadOf(view.kind, obj) }).select('token').single();
+    if (error) { toast('Lukte niet. Probeer opnieuw.'); return; }
+    view.data = { ...(view.data || {}), link: appUrl() + '#link=' + data.token }; render();
+  },
+  'copy-link'() { copyText(view.data.link); },
+  'share-link'() { const obj = itemOf(view.kind, view.id); shareText(obj.name, `Bekijk “${obj.name}” op Luca Flashcards`, view.data.link); },
+  async 'comment-status'(el) { await Cloud.sb.rpc('set_comment_status', { p_id: +el.dataset.cid, p_status: el.dataset.st }); loadItem(); },
+  async 'comment-del'(el) { await Cloud.sb.from('comments').delete().eq('id', +el.dataset.cid); loadItem(); },
+  async 'remove-member'(el) {
+    const d = view.data; await Cloud.sb.rpc('remove_member', { p_kind: view.kind, p_item: d.src, p_member: el.dataset.uid });
+    toast('Lid verwijderd'); loadItem();
+  },
+  async 'leave-yes'() {
+    const obj = itemOf(view.kind, view.id); if (!obj) return;
+    await Cloud.sb.rpc('leave_item', { p_owner: obj.owner, p_kind: view.kind, p_item: obj.srcId });
+    if (view.kind === 'folder') { decks = decks.filter(d => d.folder !== obj.id); folders = folders.filter(f => f.id !== obj.id); }
+    else decks = decks.filter(d => d.id !== obj.id);
+    Cloud.saveShared(); homeFolder = null; view = { name: 'home' }; render(); toast('Verlaten');
+  },
+  'import-link'() {
+    const name = importPayload(view.data.payload || {});
+    toast(`“${name}” toegevoegd`); view = { name: 'home', folder: homeFolder }; render(); scrollTo(0, 0);
+  },
+  'card-comment'() { session.commenting = !session.commenting; render(); const t = document.getElementById('cc-body'); if (t) t.focus(); }
+});
+
+/* ---------- Forms & inputs for the online screens ---------- */
+app.addEventListener('submit', async e => {
+  const form = e.target.closest('form'); if (!form) return;
+  const kind = form.dataset.form;
+  if (!['login', 'signup', 'reset', 'newpass', 'chat', 'comment', 'card-comment'].includes(kind)) return;
+  e.preventDefault();
+  const val = id => (document.getElementById(id) || {}).value || '';
+  if (kind === 'chat') { Chat.send(); return; }
+  if (kind === 'comment' || kind === 'card-comment') {
+    const isCard = kind === 'card-comment';
+    const obj = isCard ? getDeck(session.deckId) : itemOf(view.kind, view.id);
+    const body = val(isCard ? 'cc-body' : 'c-body').trim(); if (!body || !obj) return;
+    const sugg = (document.getElementById(isCard ? 'cc-sugg' : 'c-sugg') || {}).checked;
+    const card = isCard ? (currentCard() || {}).id || null : null;
+    const { data, error } = await Cloud.sb.rpc('add_comment', { p_owner: obj.owner, p_kind: isCard ? 'deck' : view.kind, p_item: obj.srcId, p_card: card, p_body: body, p_suggestion: !!sugg });
+    if (error || data !== 'sent') { toast('Versturen lukte niet. Probeer opnieuw.'); return; }
+    toast('Verstuurd naar de eigenaar ✓');
+    if (isCard) { session.commenting = false; render(); } else loadItem();
+    return;
+  }
+  view.email = val('a-email'); view.username = val('a-user');
+  view.busy = true; view.error = ''; render();
+  let err = null;
+  try {
+    if (kind === 'login') err = await Cloud.signIn(val('a-email'), val('a-pass'));
+    else if (kind === 'signup') err = await Cloud.signUp(val('a-email'), val('a-pass'), val('a-user'));
+    else if (kind === 'reset') {
+      const { error } = await Cloud.sb.auth.resetPasswordForEmail(val('a-email').trim(), { redirectTo: appUrl() });
+      err = error ? authError(error) : null;
+      if (!err) { view = { name: 'auth', mode: 'login' }; render(); toast('Check je mailbox voor de link.'); return; }
+    } else if (kind === 'newpass') {
+      const { error } = await Cloud.sb.auth.updateUser({ password: val('a-pass') });
+      err = error ? authError(error) : null;
+      if (!err) { toast('Nieuw wachtwoord opgeslagen'); const { data } = await Cloud.sb.auth.getSession(); if (data.session && !Cloud.user) await Cloud.start(data.session.user); view = { name: 'home' }; render(); return; }
+    }
+  } catch (ex) { err = authError(ex); }
+  if (err) { view.busy = false; view.error = err; render(); return; }
+  toast(kind === 'signup' ? `Welkom, @${Cloud.me.username}! 🎉` : `Welkom terug, @${Cloud.me.username}`);
+  afterLogin();
+});
+app.addEventListener('input', e => {
+  const t = e.target;
+  if (t.id === 'a-user') checkUsername(t.value);
+  else if (t.id === 'f-search') searchPeople(t.value);
+  else if (t.id === 'chat-input') view.draft = t.value;
+});
+
+let lastPull = 0;
 document.addEventListener('visibilitychange', async () => {
   if (document.visibilityState === 'hidden') { Store.flush(); return; }
+  if (Store.mode === 'supa') {
+    // Back in the app: pick up changes made on your other devices or by friends
+    if (Date.now() - lastPull < 30000) { Cloud.refreshCounts().catch(() => {}); return; }
+    lastPull = Date.now();
+    try { await Cloud.settle(); await Cloud.pullOwn(); await Cloud.loadShared(); await Cloud.refreshSocial(); } catch (e) { /* offline */ }
+    if (view.name === 'home' && !view.newFolder && !view.rename) render(); else updateBadges();
+    return;
+  }
   if (view.name === 'home' && !view.newFolder && !view.rename && await Store.refresh()) render();
 });
 
@@ -1813,13 +3070,30 @@ document.addEventListener('visibilitychange', async () => {
 Store.tombs = Store.loadTombs();
 Store.loadFolders();
 decks = Store.loadLocal().filter(d => d && d.id && Array.isArray(d.cards) && !Store.tombs.has(d.id));
+Stats.load();
+if (ONLINE && lsGet(LS_OWNER, null)) Cloud.loadSharedLocal();
 render();
-Store.initCloud().then(changed => { if (view.name === 'home' && !view.newFolder && !view.rename) render(); else updateSyncChip(); });
+if (window.claude) {
+  Store.initCloud().then(changed => { if (view.name === 'home' && !view.newFolder && !view.rename) render(); else updateSyncChip(); });
+} else {
+  Cloud.init().then(() => {
+    lastPull = Date.now();
+    if (handleHash()) return;
+    if (view.name === 'home' && !view.newFolder && !view.rename) render(); else updateBadges();
+  });
+}
 
 // Stand-alone version (own website): work offline and keep data safe
 if (!window.claude) {
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     navigator.serviceWorker.register('sw.js').catch(() => { /* no offline mode */ });
+    // A new version was installed: reload once so everyone gets it right away
+    let reloaded = false;
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded || view.name === 'study' || view.name === 'new') return;
+      reloaded = true; location.reload();
+    });
   }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignore */ }
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (view.name === 'home') render(); });
