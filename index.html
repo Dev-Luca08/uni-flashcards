@@ -1,0 +1,1830 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Flashcards uit je Excel-, Word-, PDF- of CSV-lijsten, met slim herhalen. Made by Luca Cicarelli.">
+<meta name="theme-color" content="#1F3FB5">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Luca Flashcards">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; font: 14px system-ui, sans-serif; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style><title>Luca Flashcards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
+<style>
+/* Layout: one mobile-first column (max 680px); study view is a full-height card stage with answer buttons at the thumb. Cards look like ruled index cards. */
+:root {
+  --bg: #E8ECF1;
+  --surface: #FFFFFF;
+  --surface-2: #F3F5F8;
+  --ink: #16202B;
+  --muted: #586473;
+  --line: #D2D9E2;
+  --accent: #1F3FB5;
+  --accent-ink: #FFFFFF;
+  --accent-soft: #E1E7FA;
+  --rule-red: #E36D6D;
+  --rule-blue: #D3DEEE;
+  --again: #C2352B;
+  --again-soft: #FBE6E4;
+  --hard: #A86A00;
+  --hard-soft: #FBF0DA;
+  --good: #1C8248;
+  --good-soft: #DFF2E6;
+  --shadow: 0 1px 2px rgba(18, 30, 52, .06), 0 10px 28px rgba(18, 30, 52, .09);
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --r: 14px;
+  /* folder colours */
+  --f0: #2F55D4; --f1: #1E8A4C; --f2: #C77D00; --f3: #C2352B; --f4: #7B4BC9; --f5: #0E8C96;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F1318; --surface: #1A2029; --surface-2: #222A35; --ink: #E6EBF1; --muted: #9AA6B4; --line: #2F3947;
+    --accent: #93A7FF; --accent-ink: #0D1330; --accent-soft: #232C4B; --rule-red: #9C4448; --rule-blue: #263247;
+    --again: #FF8277; --again-soft: #3B1F1E; --hard: #F1B14B; --hard-soft: #3A2E15; --good: #55CC86; --good-soft: #163222;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    --f0: #8FA4FF; --f1: #55CC86; --f2: #F1B14B; --f3: #FF8277; --f4: #B892FF; --f5: #4CC9D2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F1318; --surface: #1A2029; --surface-2: #222A35; --ink: #E6EBF1; --muted: #9AA6B4; --line: #2F3947;
+  --accent: #93A7FF; --accent-ink: #0D1330; --accent-soft: #232C4B; --rule-red: #9C4448; --rule-blue: #263247;
+  --again: #FF8277; --again-soft: #3B1F1E; --hard: #F1B14B; --hard-soft: #3A2E15; --good: #55CC86; --good-soft: #163222;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.35);
+    --f0: #8FA4FF; --f1: #55CC86; --f2: #F1B14B; --f3: #FF8277; --f4: #B892FF; --f5: #4CC9D2;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  -webkit-tap-highlight-color: transparent;
+}
+#app { max-width: 680px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.muted { color: var(--muted); }
+.small { font-size: .875rem; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 46px; padding: 0 18px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.ghost { background: transparent; }
+.btn.sm { min-height: 38px; padding: 0 14px; font-size: .9375rem; }
+.btn.block { width: 100%; white-space: normal; text-align: center; padding-block: 8px; }
+.empty > *, .panel > *, .card-box > *, .decks > * { min-width: 0; }
+.btn.danger { color: var(--again); border-color: color-mix(in srgb, var(--again) 40%, var(--line)); }
+.btn.danger.solid { background: var(--again); color: #fff; border-color: var(--again); }
+.btn:disabled { opacity: .45; cursor: default; }
+.icon-btn {
+  width: 44px; height: 44px; border-radius: 12px; border: 1px solid transparent; background: transparent;
+  display: inline-grid; place-items: center; font-size: 1.25rem; flex: none;
+}
+.icon-btn:hover { background: var(--surface-2); }
+.icon-btn:disabled { opacity: .35; }
+
+/* Top bar */
+.bar { display: flex; align-items: center; gap: 8px; padding-block: 14px 10px; }
+.bar h1 { font-size: 1.35rem; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.step { font-size: .8125rem; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap; }
+
+/* Home */
+.home-head { padding-block: 26px 18px; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 44px; height: 44px; flex: none; }
+.brand h1 { font-size: clamp(1.6rem, 7vw, 2rem); font-weight: 800; letter-spacing: -.02em; }
+.brand p { color: var(--muted); font-size: .9375rem; }
+.sync { display: inline-flex; align-items: center; gap: 7px; font-size: .8125rem; color: var(--muted); background: var(--surface); border: 1px solid var(--line); padding: 5px 11px; border-radius: 999px; }
+.sync i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.sync.cloud i { background: var(--good); }
+.sync.error i { background: var(--again); }
+.sync.connecting i { background: var(--hard); }
+.home-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.home-actions:has(> :only-child) { grid-template-columns: 1fr; }
+.new-btn { min-height: 54px; font-size: 1.0625rem; white-space: normal; text-align: center; line-height: 1.2; }
+.folder-form { margin-bottom: 18px; }
+.folder-tools { margin: -8px 0 14px; }
+.decks { display: grid; gap: 12px; }
+.decks + .section-title, .folders + .section-title { margin-top: 22px; }
+.section-title + .folders, .section-title + .decks { margin-top: 8px; }
+/* Folder tiles: a paper folder with a coloured tab */
+.folders { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding-top: 10px; }
+.folder { position: relative; text-align: left; border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; background: color-mix(in srgb, var(--fc) 12%, var(--surface)); padding: 16px 14px 14px; display: grid; gap: 2px; min-height: 112px; align-content: start; box-shadow: var(--shadow); }
+.folder-tab { position: absolute; left: -1px; top: -11px; width: 58px; height: 12px; border-radius: 6px 10px 0 0; background: var(--fc); }
+.folder-name { font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; line-height: 1.2; overflow-wrap: anywhere; }
+.folder-meta { font-size: .8125rem; color: var(--muted); }
+.folder-todo { font-size: .8125rem; margin-top: 6px; }
+.folder-title { display: flex; align-items: center; gap: 10px; }
+.folder-title i { width: 14px; height: 14px; border-radius: 4px; background: var(--fc); flex: none; }
+.c0 { --fc: var(--f0); } .c1 { --fc: var(--f1); } .c2 { --fc: var(--f2); } .c3 { --fc: var(--f3); } .c4 { --fc: var(--f4); } .c5 { --fc: var(--f5); }
+.deck { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); box-shadow: var(--shadow); overflow: hidden; }
+.deck-main { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 16px 16px 12px; }
+.deck-main h2 { font-size: 1.25rem; margin-bottom: 4px; overflow-wrap: anywhere; }
+.deck .meta { color: var(--muted); font-size: .875rem; overflow-wrap: anywhere; }
+.meter { display: flex; height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; margin: 12px 0 8px; }
+.meter span { display: block; height: 100%; }
+.meter .m-known { background: var(--good); }
+.meter .m-learn { background: var(--hard); }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .8125rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.legend b { color: var(--ink); }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: 1px; }
+.dot.k { background: var(--good); } .dot.l { background: var(--hard); } .dot.n { background: var(--line); }
+.deck-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 16px 14px; border-top: 1px dashed var(--line); flex-wrap: wrap; }
+.todo { font-size: .9375rem; }
+.todo b { font-variant-numeric: tabular-nums; }
+.deck-foot .acts { display: flex; gap: 8px; }
+
+.empty { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px 18px; display: grid; gap: 14px; box-shadow: var(--shadow); }
+.empty h2 { font-size: 1.3rem; }
+.sheet-demo { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+.sheet-demo table { border-collapse: collapse; width: 100%; font-size: .875rem; min-width: 460px; }
+.sheet-demo th, .sheet-demo td { border: 1px solid var(--line); padding: 6px 9px; text-align: left; }
+.sheet-demo th { background: var(--surface-2); color: var(--muted); font-weight: 700; font-size: .75rem; letter-spacing: .05em; }
+.sheet-demo td.rn, .sheet-demo th.rn { width: 32px; text-align: center; color: var(--muted); background: var(--surface-2); }
+
+.backup-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+.backup-row label { cursor: pointer; }
+.zip-box { margin-top: 16px; display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--surface); border: 1px dashed var(--line); border-radius: var(--r); padding: 14px 16px; }
+.zip-box > div { flex: 1 1 220px; min-width: 0; }
+.install-btn { margin-bottom: 16px; border-style: dashed; }
+.install-tip { margin-bottom: 16px; font-size: .9375rem; background: var(--accent-soft); padding: 10px 12px; border-radius: 10px; }
+.footer { margin-top: auto; padding-block: 32px 22px; text-align: center; color: var(--muted); font-size: .875rem; }
+.footer b { font-family: var(--font-display); color: var(--ink); font-weight: 600; }
+
+/* Panels / forms */
+.panel { display: grid; gap: 16px; padding-bottom: 28px; }
+.card-box { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; display: grid; gap: 12px; }
+label.lbl, .lbl { font-weight: 700; font-size: .9375rem; }
+.help { color: var(--muted); font-size: .875rem; margin-top: -6px; }
+.field { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 10px 12px; }
+textarea.field { min-height: 150px; resize: vertical; font-family: ui-monospace, "Cascadia Mono", Menlo, monospace; font-size: .875rem; }
+select.field { padding-right: 8px; }
+input.field, select.field { height: 46px; min-height: 0; padding-block: 0; }
+.card-row input.field { height: 40px; }
+.sides-pick { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.pick { border: 2px solid var(--line); background: var(--surface); border-radius: var(--r); padding: 14px 8px 12px; display: grid; justify-items: center; gap: 8px; text-align: center; }
+.pick[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.pick b { font-family: var(--font-display); font-size: 1.15rem; }
+.pick small { color: var(--muted); font-size: .75rem; line-height: 1.3; }
+.stack { position: relative; width: 56px; height: 44px; }
+.stack span { position: absolute; width: 40px; height: 28px; border-radius: 5px; background: var(--surface); border: 1.5px solid var(--muted); }
+.tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+.tabs button { border: 0; background: transparent; border-radius: 9px; min-height: 40px; font-weight: 700; font-size: .875rem; color: var(--muted); padding: 0 4px; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+.drop { display: grid; place-items: center; gap: 6px; text-align: center; border: 2px dashed var(--line); border-radius: var(--r); padding: 34px 16px; background: var(--surface); cursor: pointer; }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.drop strong { font-size: 1.05rem; }
+.drop .big { font-size: 2rem; line-height: 1; }
+.error { background: var(--again-soft); color: var(--again); border-radius: 10px; padding: 10px 12px; font-size: .9375rem; }
+.warn { background: var(--hard-soft); color: var(--ink); border-left: 4px solid var(--hard); border-radius: 10px; padding: 10px 12px; font-size: .9375rem; display: grid; gap: 8px; }
+.found { font-size: 1rem; }
+.check { display: flex; gap: 10px; align-items: center; font-size: .9375rem; }
+.check input { width: 20px; height: 20px; accent-color: var(--accent); flex: none; }
+.map-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; align-items: center; padding-top: 6px; border-top: 1px dashed var(--line); }
+.map-row .num, .side-row .num { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.preview { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.preview table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+.preview th, .preview td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; min-width: 110px; }
+.preview th { font-size: .75rem; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
+.preview tr:last-child td { border-bottom: 0; }
+.sticky-save { position: sticky; bottom: 0; padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, var(--bg) 70%, transparent); }
+
+/* Edit */
+.section-title { font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); font-weight: 700; margin-top: 6px; }
+.side-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 8px; align-items: center; padding-top: 6px; border-top: 1px dashed var(--line); }
+.side-head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.side-head em { font-style: normal; font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--accent); }
+.mover { display: inline-flex; gap: 4px; }
+.icon-btn.sm-icon { width: 36px; height: 36px; font-size: 1rem; border: 1px solid var(--line); background: var(--surface-2); }
+.swap-btn { justify-self: start; }
+.order-line { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-weight: 700; }
+.order-line span { background: var(--accent-soft); color: var(--accent); padding: 3px 10px; border-radius: 999px; font-size: .875rem; }
+.order-line i { color: var(--muted); font-style: normal; }
+.fixed { font-size: .875rem; color: var(--good); background: var(--good-soft); padding: 8px 12px; border-radius: 10px; }
+.inline-new { display: flex; gap: 8px; }
+.inline-new .field { flex: 1; min-width: 0; }
+.drop.busy { opacity: .7; pointer-events: none; }
+.opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.opts > div { display: grid; gap: 4px; }
+.card-list { display: grid; gap: 8px; }
+.card-row { display: grid; grid-template-columns: 28px 1fr 40px; gap: 8px; align-items: start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 8px; }
+.card-row .idx { font-size: .75rem; color: var(--muted); text-align: center; padding-top: 12px; font-variant-numeric: tabular-nums; }
+.card-row .fields { display: grid; gap: 6px; min-width: 0; }
+.card-row .field { min-height: 40px; padding: 7px 10px; }
+.card-row .st { font-size: .7rem; color: var(--muted); }
+.btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.danger-zone { border-color: color-mix(in srgb, var(--again) 35%, var(--line)); }
+
+/* Study */
+.study { display: flex; flex-direction: column; min-height: 100%; flex: 1; }
+.study .bar { padding-bottom: 6px; }
+.study .title { flex: 1; min-width: 0; display: grid; }
+.study .title b { font-family: var(--font-display); font-size: 1.05rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.counts { display: flex; gap: 12px; font-size: .8125rem; font-variant-numeric: tabular-nums; }
+.counts .c-new { color: var(--accent); } .counts .c-learn { color: var(--again); } .counts .c-rev { color: var(--good); }
+.progress { height: 4px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.progress span { display: block; height: 100%; background: var(--accent); transition: width .3s ease; }
+.stage { flex: 1; display: flex; flex-direction: column; justify-content: center; padding-block: 12px; position: relative; min-height: 0; }
+.flash {
+  position: relative; width: 100%; min-height: min(50vh, 420px); min-height: min(50dvh, 420px); border: 1px solid var(--line); border-radius: 16px;
+  background-color: var(--surface);
+  background-image:
+    linear-gradient(to bottom, transparent 55px, var(--rule-red) 55px, var(--rule-red) 57px, transparent 57px),
+    repeating-linear-gradient(to bottom, transparent 0, transparent 33px, var(--rule-blue) 33px, var(--rule-blue) 34px);
+  background-position: 0 0, 0 57px;
+  background-repeat: no-repeat, repeat;
+  box-shadow: var(--shadow); text-align: center; display: flex; flex-direction: column; padding: 0; overflow: hidden;
+}
+.flash.anim { animation: flipIn .22s ease-out; }
+@keyframes flipIn { from { transform: perspective(900px) rotateY(-70deg); opacity: .4; } to { transform: none; opacity: 1; } }
+.flash-top { height: 55px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px 0 18px; gap: 8px; }
+.side-label { font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip { font-size: .75rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; white-space: nowrap; display: inline-flex; gap: 5px; align-items: center; }
+.chip.new { background: var(--accent-soft); color: var(--accent); }
+.chip.learn { background: var(--hard-soft); color: var(--hard); }
+.chip.review { background: var(--good-soft); color: var(--good); }
+.pip { width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid currentColor; display: inline-block; }
+.pip.on { background: currentColor; }
+.flash-body { flex: 1; display: grid; place-items: center; padding: 20px 22px 12px; }
+.flash-text { font-family: var(--font-body); font-weight: 700; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.3; }
+.flash-text.s1 { font-size: clamp(2rem, 8vw, 2.8rem); font-family: var(--font-display); font-weight: 600; letter-spacing: -.01em; }
+.flash-text.s2 { font-size: clamp(1.5rem, 5.6vw, 2rem); }
+.flash-text.s3 { font-size: 1.3rem; font-weight: 400; }
+.flash-text.s4 { font-size: 1.05rem; font-weight: 400; text-align: left; }
+.flash-text.blank { color: var(--muted); font-weight: 400; font-size: 1rem; }
+.flash-foot { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 0 16px 16px; min-height: 48px; }
+.side-dots { display: flex; gap: 6px; }
+.side-dots span { width: 9px; height: 9px; border-radius: 50%; background: var(--line); }
+.side-dots span.on { background: var(--accent); }
+.tap-hint { font-size: .8125rem; color: var(--muted); }
+.card-wrap { position: relative; }
+.speak { position: absolute; right: 12px; bottom: 10px; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--line); background: var(--surface-2); font-size: 1.2rem; display: grid; place-items: center; }
+.answers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding-block: 4px calc(14px + env(safe-area-inset-bottom, 0px)); }
+.answers.single { grid-template-columns: 1fr; }
+.ans { border-radius: 14px; border: 1.5px solid transparent; min-height: 70px; display: grid; align-content: center; justify-items: center; gap: 2px; padding: 8px 4px; font-weight: 700; }
+.ans small { font-weight: 400; font-size: .75rem; opacity: .9; }
+.ans.again { background: var(--again-soft); color: var(--again); border-color: color-mix(in srgb, var(--again) 35%, transparent); }
+.ans.hard { background: var(--hard-soft); color: var(--hard); border-color: color-mix(in srgb, var(--hard) 35%, transparent); }
+.ans.good { background: var(--good-soft); color: var(--good); border-color: color-mix(in srgb, var(--good) 35%, transparent); }
+.ans .lbl-t { font-size: .9375rem; line-height: 1.2; text-align: center; }
+kbd { font-family: ui-monospace, Menlo, monospace; font-size: .7rem; border: 1px solid currentColor; border-radius: 4px; padding: 0 4px; opacity: .6; }
+.flip-btn { min-height: 70px; font-size: 1.1rem; border-radius: 14px; }
+
+/* Done */
+.done { display: grid; gap: 18px; padding-block: 40px 20px; text-align: center; }
+.done h1 { font-size: 1.9rem; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 6px; }
+.stat b { display: block; font-family: var(--font-display); font-size: 1.8rem; font-variant-numeric: tabular-nums; }
+.stat span { font-size: .8125rem; color: var(--muted); }
+.done .btns { display: grid; gap: 10px; }
+
+#toast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 12px; font-size: .9375rem; max-width: calc(100% - 32px); box-shadow: var(--shadow); z-index: 20; }
+
+@media (max-width: 460px) {
+  .folders { grid-template-columns: 1fr 1fr; }
+  .opts { grid-template-columns: 1fr; }
+  .ans .lbl-t { font-size: .875rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flash.anim { animation: none; }
+  .progress span { transition: none; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+'use strict';
+/* =========================================================
+   Luca Flashcards — made by Luca Cicarelli
+   ========================================================= */
+
+const LS_KEY = 'tarjeta.decks.v1';
+const LS_TOMB = 'tarjeta.deleted.v1';
+const LS_FOLDERS = 'tarjeta.folders.v1';
+const DEFAULT_NAMES = ['Woord', 'Uitleg', 'Zin', 'Extra'];
+const LANGS = [
+  ['', 'Geen voorlezen'], ['es-ES', 'Spaans'], ['en-GB', 'Engels (UK)'], ['en-US', 'Engels (US)'],
+  ['nl-BE', 'Nederlands'], ['fr-FR', 'Frans'], ['de-DE', 'Duits'], ['it-IT', 'Italiaans'], ['pt-PT', 'Portugees']
+];
+const HEADER_WORDS = ['spaans','spanish','espanol','castellano','engels','english','ingles','nederlands','dutch','vlaams','frans','french','frances','duits','german','aleman','italiaans','italian',
+  'woord','woorden','word','words','palabra','palabras','vocabulario','zin','zinnen','sentence','sentences','frase','frases','oracion','ejemplo','ejemplos','voorbeeld','voorbeeldzin','example',
+  'betekenis','meaning','uitleg','definitie','definition','significado','vertaling','translation','traduccion','term','begrip','vraag','antwoord','question','answer','front','back',
+  'voorkant','achterkant','kant','side','kolom','column','extra','notitie','notes','opmerking'];
+
+const app = document.getElementById('app');
+let decks = [];
+let folders = [];
+let foldersUpdated = 0;
+let view = { name: 'home' };
+let session = null;
+let wiz = null;
+
+/* ---------- helpers ---------- */
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const today = () => { const d = new Date(); return Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 86400000); };
+const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[:.]+$/, '').trim();
+const colLetter = i => { let s = ''; i++; while (i > 0) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function withTimeout(p, ms) { return Promise.race([p, new Promise((_, rej) => setTimeout(() => rej({ code: 'timeout' }), ms))]); }
+const getDeck = id => decks.find(d => d.id === id);
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+let toastT;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3200);
+}
+
+function guessLang(name, i, langs) {
+  const n = norm(name);
+  if (/spa|espa|castell/.test(n)) return 'es-ES';
+  if (/engl|ingl/.test(n)) return 'en-GB';
+  if (/nederl|dutch|vlaams/.test(n)) return 'nl-BE';
+  if (/frans|french|franc/.test(n)) return 'fr-FR';
+  if (/duits|german|alem/.test(n)) return 'de-DE';
+  if (/ital/.test(n)) return 'it-IT';
+  if (/zin|frase|sentence|oracion|ejemplo|voorbeeld|example/.test(n)) return (langs && langs[0]) || 'es-ES';
+  if (/uitleg|betekenis|meaning|defin|significado|vertaling|translation/.test(n)) return 'en-GB';
+  return ['es-ES', 'en-GB', 'es-ES', ''][i] ?? '';
+}
+
+function newCard(sides) { return { id: uid(), s: sides, st: 'new', k: 0, iv: 0, due: 0, reps: 0, lapses: 0 }; }
+
+function makeDeck(name, n, names, cardsSides) {
+  const langs = [];
+  names.forEach((nm, i) => langs.push(guessLang(nm, i, langs)));
+  const now = Date.now();
+  return {
+    id: uid(), name: name || 'Nieuwe set', n, names, langs,
+    cards: cardsSides.map(s => newCard(s)),
+    created: now, updated: now, last: 0,
+    opt: { newLimit: 30, start: 0, shuffle: true }
+  };
+}
+
+function deckStats(d) {
+  const t = today(); let nw = 0, lr = 0, kn = 0, due = 0, tomorrow = 0;
+  for (const c of d.cards) {
+    if (c.st === 'new') nw++;
+    else if (c.st === 'learn') lr++;
+    else { kn++; if (c.due <= t) due++; else if (c.due === t + 1) tomorrow++; }
+  }
+  const lim = d.opt?.newLimit || 0;
+  const newToday = lim ? Math.min(nw, lim) : nw;
+  return { nw, lr, kn, due, tomorrow, total: d.cards.length, newToday, todo: due + lr + newToday };
+}
+
+/* =========================================================
+   Storage: this device (localStorage) + cloud sync (db)
+   ========================================================= */
+const Store = {
+  mode: (window.claude && typeof window.claude.use === 'function') ? 'connecting' : 'local',
+  db: null, col: null,
+  written: new Map(), chunkCount: new Map(), timers: new Map(),
+  chain: Promise.resolve(), tombs: new Set(), errorShown: false,
+
+  loadLocal() {
+    try { const raw = localStorage.getItem(LS_KEY); const v = raw ? JSON.parse(raw) : []; return Array.isArray(v) ? v : []; } catch (e) { return []; }
+  },
+  loadTombs() {
+    try { const raw = localStorage.getItem(LS_TOMB); return new Set(raw ? JSON.parse(raw) : []); } catch (e) { return new Set(); }
+  },
+  loadFolders() {
+    try { const raw = localStorage.getItem(LS_FOLDERS); const v = raw ? JSON.parse(raw) : null; if (v && Array.isArray(v.list)) { folders = v.list; foldersUpdated = v.updated || 0; } } catch (e) { /* none */ }
+  },
+  saveLocal() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(decks));
+      localStorage.setItem(LS_TOMB, JSON.stringify([...this.tombs]));
+      localStorage.setItem(LS_FOLDERS, JSON.stringify({ list: folders, updated: foldersUpdated }));
+    } catch (e) { /* storage blocked: keep in memory */ }
+  },
+  touchFolders() {
+    foldersUpdated = Date.now();
+    this.saveLocal();
+    if (this.mode !== 'cloud') return;
+    clearTimeout(this.folderTimer);
+    this.folderTimer = setTimeout(() => { this.folderTimer = null; this.queueFolders(); }, 600);
+  },
+  queueFolders() {
+    const body = { kind: 'folders', list: folders, updated: foldersUpdated };
+    this.chain = this.chain.then(async () => {
+      const s = JSON.stringify(body);
+      if (this.written.get('folders') === s) return;
+      await this.write(() => this.col.doc('folders').set(body));
+      this.written.set('folders', s);
+    }).catch(e => this.fail(e));
+  },
+
+  async initCloud() {
+    if (this.mode !== 'connecting') return false;
+    try {
+      const [db, user] = await withTimeout(Promise.all([claude.use('db'), claude.use('user')]), 12000);
+      if (!db || !user) { this.mode = 'local'; return false; }
+      const id = await user.id();
+      if (!id) { this.mode = 'local'; return false; }
+      this.db = db; this.col = db.collection('data/users/' + id);
+      const cloud = await this.fetchCloud();
+      this.mode = 'cloud';
+      return this.merge(cloud);
+    } catch (e) {
+      this.mode = this.col ? 'error' : 'local';
+      return false;
+    }
+  },
+
+  async fetchCloud() {
+    const snap = await withTimeout(this.col.get(), 12000);
+    const metas = {}, chunks = {};
+    for (const d of snap.docs) {
+      const raw = d.data(); if (!raw) continue;
+      const b = JSON.parse(JSON.stringify(raw));
+      this.written.set(d.id, JSON.stringify(raw));
+      if (b.kind === 'deck' && b.deck && b.deck.id) metas[b.deck.id] = b;
+      else if (b.kind === 'cards') { (chunks[b.deckId] ||= [])[b.i] = b.cards || []; }
+      else if (b.kind === 'tombs') { (b.ids || []).forEach(x => this.tombs.add(x)); }
+      else if (b.kind === 'folders') this.cloudFolders = b;
+    }
+    const out = [];
+    for (const id in metas) {
+      const m = metas[id]; const cards = [];
+      for (let i = 0; i < m.chunks; i++) cards.push(...((chunks[id] && chunks[id][i]) || []));
+      out.push({ ...m.deck, cards });
+      this.chunkCount.set(id, m.chunks);
+    }
+    return out;
+  },
+
+  merge(cloud) {
+    const map = new Map();
+    for (const d of cloud) if (!this.tombs.has(d.id)) map.set(d.id, d);
+    const push = [];
+    for (const d of decks) {
+      if (this.tombs.has(d.id)) continue;
+      const c = map.get(d.id);
+      if (!c || (d.updated || 0) > (c.updated || 0)) { map.set(d.id, d); push.push(d.id); }
+    }
+    const before = JSON.stringify(decks.map(d => [d.id, d.updated])) + foldersUpdated;
+    decks = [...map.values()];
+    // Folders: newest list wins
+    const cf = this.cloudFolders;
+    let pushFolders = false;
+    if (cf && (cf.updated || 0) > foldersUpdated) { folders = JSON.parse(JSON.stringify(cf.list || [])); foldersUpdated = cf.updated || 0; }
+    else if (foldersUpdated && (!cf || foldersUpdated > (cf.updated || 0))) pushFolders = true;
+    this.saveLocal();
+    for (const id of push) this.queuePush(id);
+    if (pushFolders) this.queueFolders();
+    return before !== JSON.stringify(decks.map(d => [d.id, d.updated])) + foldersUpdated || push.length > 0;
+  },
+
+  async refresh() {
+    if (this.mode !== 'cloud' || this.timers.size || this.folderTimer) return false;
+    try { const cloud = await this.fetchCloud(); return this.merge(cloud); } catch (e) { return false; }
+  },
+
+  touch(deck) {
+    deck.updated = Date.now();
+    this.saveLocal();
+    if (this.mode !== 'cloud') return;
+    clearTimeout(this.timers.get(deck.id));
+    this.timers.set(deck.id, setTimeout(() => { this.timers.delete(deck.id); this.queuePush(deck.id); }, 900));
+  },
+
+  flush() {
+    for (const [id, t] of this.timers) { clearTimeout(t); this.queuePush(id); }
+    this.timers.clear();
+    if (this.folderTimer) { clearTimeout(this.folderTimer); this.folderTimer = null; this.queueFolders(); }
+  },
+
+  queuePush(id) { this.chain = this.chain.then(() => this.pushDeck(id)).catch(e => this.fail(e)); },
+
+  docsFor(deck) {
+    const { cards, ...meta } = deck;
+    const chunks = []; let cur = [], size = 0;
+    for (const c of cards) {
+      const len = JSON.stringify(c).length;
+      if (cur.length && size + len > 60000) { chunks.push(cur); cur = []; size = 0; }
+      cur.push(c); size += len;
+    }
+    if (cur.length || !chunks.length) chunks.push(cur);
+    const docs = chunks.map((c, i) => ['cards-' + deck.id + '-' + i, { kind: 'cards', deckId: deck.id, i, cards: c }]);
+    docs.push(['deck-' + deck.id, { kind: 'deck', deck: meta, chunks: chunks.length, updated: deck.updated }]);
+    return docs;
+  },
+
+  async write(fn) {
+    try { await fn(); }
+    catch (e) {
+      if (e && (e.code === 'unavailable' || e.code === 'resource_exhausted')) { await sleep(700 + Math.random() * 900); await fn(); }
+      else throw e;
+    }
+  },
+
+  async pushDeck(id) {
+    if (this.mode !== 'cloud') return;
+    const deck = getDeck(id); if (!deck) return;
+    const docs = this.docsFor(deck);
+    for (const [docId, body] of docs) {
+      const s = JSON.stringify(body);
+      if (this.written.get(docId) === s) continue;
+      await this.write(() => this.col.doc(docId).set(body));
+      this.written.set(docId, s);
+    }
+    const old = this.chunkCount.get(id) || 0, now = docs.length - 1;
+    for (let i = now; i < old; i++) { const docId = 'cards-' + id + '-' + i; await this.write(() => this.col.doc(docId).delete()); this.written.delete(docId); }
+    this.chunkCount.set(id, now);
+    if (this.errorShown) { this.errorShown = false; updateSyncChip(); }
+  },
+
+  removeDeck(id) {
+    this.tombs.add(id);
+    decks = decks.filter(d => d.id !== id);
+    clearTimeout(this.timers.get(id)); this.timers.delete(id);
+    this.saveLocal();
+    if (this.mode !== 'cloud') return;
+    this.chain = this.chain.then(async () => {
+      await this.write(() => this.col.doc('tombs').set({ kind: 'tombs', ids: [...this.tombs].slice(-500) }));
+      await this.write(() => this.col.doc('deck-' + id).delete());
+      const n = this.chunkCount.get(id) || 0;
+      for (let i = 0; i < n; i++) await this.write(() => this.col.doc('cards-' + id + '-' + i).delete());
+      this.chunkCount.delete(id);
+    }).catch(e => this.fail(e));
+  },
+
+  fail(e) {
+    this.written.clear();
+    // Visitors via a public link may read but not save online: just keep everything on this device
+    if (e && (e.code === 'invalid_argument' || e.code === 'not_granted' || e.code === 'revoked')) {
+      this.mode = 'local'; this.chain = Promise.resolve(); updateSyncChip(); return;
+    }
+    if (!this.errorShown) {
+      this.errorShown = true;
+      toast(e && e.code === 'quota_exceeded'
+        ? 'De online opslag is vol. Je kaarten staan wel op dit toestel.'
+        : 'Synchroniseren lukte even niet. Je kaarten staan veilig op dit toestel.');
+      updateSyncChip();
+    }
+  }
+};
+
+function syncInfo() {
+  if (Store.mode === 'cloud' && Store.errorShown) return ['error', 'Sync onderbroken'];
+  if (Store.mode === 'cloud') return ['cloud', 'Gesynchroniseerd'];
+  if (Store.mode === 'connecting') return ['connecting', 'Verbinden…'];
+  if (Store.mode === 'error') return ['error', 'Alleen op dit toestel'];
+  return ['local', 'Op dit toestel'];
+}
+function updateSyncChip() {
+  const el = document.getElementById('sync'); if (!el) return;
+  const [cls, txt] = syncInfo(); el.className = 'sync ' + cls; el.innerHTML = '<i></i>' + esc(txt);
+}
+
+/* =========================================================
+   Import: Excel (xlsx/xls/xlsm/xlsb), Numbers, OpenOffice (ods/odt),
+   CSV/TSV/TXT, Word (.docx), PDF, HTML tables and pasted cells
+   ========================================================= */
+const LIB = {
+  jszip: 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',
+  pdf: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
+  pdfWorker: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+};
+const scriptPromises = {};
+function loadScript(src, globalName) {
+  if (globalName && window[globalName]) return Promise.resolve();
+  return scriptPromises[src] ||= new Promise((res, rej) => {
+    const s = document.createElement('script'); s.src = src; s.async = true;
+    s.onload = () => res();
+    s.onerror = () => { delete scriptPromises[src]; rej(new Error('nolib')); };
+    (document.head || document.documentElement).appendChild(s);
+  });
+}
+class UserError extends Error { constructor(msg) { super(msg); this.userMsg = msg; } }
+
+function decodeText(buf) {
+  const b = new Uint8Array(buf);
+  if (b[0] === 0xFF && b[1] === 0xFE) return new TextDecoder('utf-16le').decode(b.subarray(2));
+  if (b[0] === 0xFE && b[1] === 0xFF) return new TextDecoder('utf-16be').decode(b.subarray(2));
+  if (b[0] === 0xEF && b[1] === 0xBB && b[2] === 0xBF) return new TextDecoder('utf-8').decode(b.subarray(3));
+  // UTF-16 without BOM: lots of zero bytes on odd positions
+  let zeros = 0; const n = Math.min(b.length, 400);
+  for (let i = 1; i < n; i += 2) if (b[i] === 0) zeros++;
+  if (n > 10 && zeros > n / 4) return new TextDecoder('utf-16le').decode(b);
+  try { return new TextDecoder('utf-8', { fatal: true }).decode(b); }
+  catch (e) { try { return new TextDecoder('windows-1252').decode(b); } catch (e2) { return new TextDecoder().decode(b); } }
+}
+
+function countOutside(line, sep) {
+  if (sep.length > 1) return line.split(sep).length - 1;
+  let n = 0, q = false; for (const c of line) { if (c === '"') q = !q; else if (c === sep && !q) n++; } return n;
+}
+// Share of lines that contain the separator the same (most common) number of times
+function sepScore(lines, sep) {
+  const freq = {};
+  for (const l of lines) { const x = countOutside(l, sep); if (x > 0) freq[x] = (freq[x] || 0) + 1; }
+  let top = 0, cnt = 0; for (const k in freq) if (freq[k] > top) { top = freq[k]; cnt = +k; }
+  return { sep, score: top / Math.max(1, lines.length), count: cnt };
+}
+function parseCSV(text, delim) {
+  const rows = []; let row = [], cell = '', q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+      else cell += c;
+    } else if (c === '"' && cell.trim() === '') { q = true; cell = ''; }
+    else if (c === delim) { row.push(cell); cell = ''; }
+    else if (c === '\n' || c === '\r') {
+      if (c === '\r' && text[i + 1] === '\n') i++;
+      row.push(cell); rows.push(row); row = []; cell = '';
+    } else cell += c;
+  }
+  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+  return rows;
+}
+const TEXT_SEPS = [' = ', ' – ', ' — ', ' - ', ' -> ', ' → ', ' : ', ': ', ' / ', ' | '];
+// Turns any text (CSV, TSV, "woord - uitleg" lists, pasted cells) into rows
+function parseText(text) {
+  text = String(text || '').replace(/^﻿/, '').replace(/ /g, ' ');
+  const m = text.match(/^sep=(.)\r?\n/i);
+  if (m) return parseCSV(text.slice(m[0].length), m[1]);
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  if (!lines.length) return [];
+  const sample = lines.slice(0, 60);
+  if (sample.some(l => l.includes('\t'))) return parseCSV(text, '\t');
+  const csv = [';', '|', ','].map(s => sepScore(sample, s)).sort((a, b) => b.score - a.score)[0];
+  const txt = TEXT_SEPS.map(s => sepScore(sample, s)).sort((a, b) => b.score - a.score)[0];
+  const strongCsv = csv.score >= 0.6 && csv.sep !== ',';
+  if (strongCsv && csv.score >= txt.score) return parseCSV(text, csv.sep);
+  if (txt.score >= 0.6 && txt.score >= csv.score) return lines.map(l => l.split(txt.sep));
+  if (csv.score >= 0.6) return parseCSV(text, csv.sep);
+  return lines.map(l => [l]);
+}
+const parseDelimited = parseText;
+
+function cleanCell(v) {
+  let s = String(v ?? '').replace(/[   ]/g, ' ').replace(/\r\n?/g, '\n');
+  s = s.replace(/[ \t]+/g, ' ').replace(/ *\n */g, '\n').replace(/\n{3,}/g, '\n\n').trim();
+  if (/^#(N\/A|REF!|VALUE!|NAME\?|DIV\/0!|NULL!|NUM!)$/i.test(s)) return '';
+  return s;
+}
+function padRows(rows) {
+  const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  return rows.map(r => { const a = r.slice(0, width); while (a.length < width) a.push(''); return a; });
+}
+function dropEmptyCols(rows) {
+  const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  const keep = []; for (let c = 0; c < width; c++) if (rows.some(r => r[c])) keep.push(c);
+  return rows.map(r => keep.map(c => r[c] || ''));
+}
+// Cleans a raw table so it turns into good flashcards. Returns { rows, notes }
+function cleanTable(raw) {
+  const notes = { title: 0, numbering: false, split: false };
+  let rows = (raw || []).map(r => (Array.isArray(r) ? r : [r]).map(cleanCell)).filter(r => r.some(Boolean));
+  rows = dropEmptyCols(padRows(rows));
+  let width = rows[0] ? rows[0].length : 0;
+  // One column with "woord - uitleg" or "woord = uitleg" inside → split it
+  if (width === 1 && rows.length) {
+    const split = parseText(rows.map(r => r[0].replace(/\n/g, ' ')).join('\n'));
+    const w = split.reduce((m, r) => Math.max(m, r.length), 0);
+    if (w >= 2) { rows = dropEmptyCols(padRows(split.map(r => r.map(cleanCell)))).filter(r => r.some(Boolean)); width = rows[0].length; notes.split = true; }
+  }
+  if (width >= 2) {
+    // Title lines above the table (only one cell filled) → skip
+    while (rows.length > 2 && rows[0].filter(Boolean).length === 1 && rows.slice(1, 6).some(r => r.filter(Boolean).length >= 2)) { rows.shift(); notes.title++; }
+    // Column with only row numbers (1, 2, 3 …) → remove
+    const body = rows.slice(1);
+    const isNum = v => /^\d{1,4}[.)]?$/.test(v);
+    if (body.length >= 2 && body.filter(r => isNum(r[0])).length >= body.length * 0.9) {
+      rows = dropEmptyCols(rows.map(r => r.slice(1))); notes.numbering = true; width = rows[0] ? rows[0].length : 0;
+    }
+  }
+  // "1. el perro" / "1) el perro" → "el perro"
+  const lead = /^\d{1,4}\s*[.)]\s+(?=\S)/;
+  const filled = rows.filter(r => r[0]);
+  if (filled.length >= 2 && filled.filter(r => lead.test(r[0])).length >= filled.length * 0.7) {
+    rows = rows.map(r => [r[0].replace(lead, ''), ...r.slice(1)]); notes.numbering = true;
+  }
+  return { rows, notes };
+}
+
+function guessHeader(rows) {
+  if (rows.length < 2) return false;
+  const r0 = rows[0].map(norm);
+  const hit = r0.some(v => v && (HEADER_WORDS.includes(v) || v.split(/[\s\-\/()_,]+/).some(w => HEADER_WORDS.includes(w))));
+  if (hit) return true;
+  // Sentence column heuristic: header cell short while the data below is much longer
+  const lastCol = rows[0].length - 1;
+  if (lastCol >= 1) {
+    const body = rows.slice(1, 30).map(r => (r[lastCol] || '').length).filter(Boolean);
+    const avg = body.reduce((a, b) => a + b, 0) / Math.max(1, body.length);
+    const h = (rows[0][lastCol] || '').length;
+    if (h > 0 && avg > 25 && h < avg / 3 && !/[.!?¿¡]/.test(rows[0][lastCol])) return true;
+  }
+  return false;
+}
+
+/* ---------- Word (.docx) and OpenDocument text (.odt) ---------- */
+function parseDocx(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const kids = (el, name) => Array.from(el.childNodes).filter(n => n.localName === name);
+  const pText = p => {
+    let s = '';
+    for (const n of p.getElementsByTagName('*')) {
+      const ln = n.localName, parent = n.parentNode && n.parentNode.localName;
+      if (ln === 't' && parent === 'r') s += n.textContent;
+      else if (ln === 'tab' && parent === 'r') s += '\t';
+      else if ((ln === 'br' || ln === 'cr') && parent === 'r') s += '\n';
+    }
+    return s;
+  };
+  const cellText = tc => kids(tc, 'p').map(pText).join('\n');
+  const tblRows = tbl => kids(tbl, 'tr').map(tr => kids(tr, 'tc').flatMap(tc => {
+    const gs = tc.getElementsByTagName('w:gridSpan')[0];
+    const span = gs ? Math.min(20, +gs.getAttribute('w:val') || 1) : 1;
+    return [cellText(tc), ...Array(span - 1).fill('')];
+  }));
+  const sheets = {}; const paras = []; let ti = 0;
+  const walk = el => {
+    for (const n of el.childNodes) {
+      if (n.localName === 'tbl') { const r = tblRows(n); if (r.length) sheets['Tabel ' + (++ti)] = r; }
+      else if (n.localName === 'p') paras.push(pText(n));
+      else if (['sdt', 'sdtContent', 'customXml', 'body'].includes(n.localName)) walk(n);
+    }
+  };
+  walk(doc.documentElement);
+  if (!ti) { const rows = parseText(paras.join('\n')); if (rows.length) sheets['Tekst'] = rows; }
+  return sheets;
+}
+function parseOdt(xml) {
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+  const T = 'urn:oasis:names:tc:opendocument:xmlns:table:1.0';
+  const sheets = {}; let ti = 0;
+  for (const tbl of doc.getElementsByTagNameNS(T, 'table')) {
+    const rows = [];
+    for (const tr of tbl.getElementsByTagNameNS(T, 'table-row')) {
+      const row = [];
+      for (const tc of tr.childNodes) {
+        if (tc.localName !== 'table-cell' && tc.localName !== 'covered-table-cell') continue;
+        const rep = Math.min(20, +(tc.getAttributeNS(T, 'number-columns-repeated') || 1));
+        const txt = Array.from(tc.childNodes).map(n => n.textContent).join('\n');
+        for (let i = 0; i < rep; i++) row.push(txt);
+      }
+      rows.push(row);
+    }
+    if (rows.length) sheets['Tabel ' + (++ti)] = rows;
+  }
+  if (!ti) {
+    const TX = 'urn:oasis:names:tc:opendocument:xmlns:text:1.0';
+    const lines = [...doc.getElementsByTagNameNS(TX, 'p'), ...doc.getElementsByTagNameNS(TX, 'h')].map(p => p.textContent);
+    const rows = parseText(lines.join('\n')); if (rows.length) sheets['Tekst'] = rows;
+  }
+  return sheets;
+}
+async function readZipDoc(buf) {
+  await loadScript(LIB.jszip, 'JSZip');
+  const zip = await JSZip.loadAsync(buf);
+  const docXml = zip.file('word/document.xml');
+  if (docXml) return parseDocx(await docXml.async('string'));
+  const mt = zip.file('mimetype'); const mime = mt ? await mt.async('string') : '';
+  if (/opendocument\.text/.test(mime) && zip.file('content.xml')) return parseOdt(await zip.file('content.xml').async('string'));
+  return null;
+}
+
+/* ---------- PDF: rebuild the columns from text positions ---------- */
+async function readPdf(buf) {
+  await loadScript(LIB.pdf, 'pdfjsLib');
+  await loadScript(LIB.pdfWorker, 'pdfjsWorker');
+  const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+  if (!lib) throw new Error('nolib');
+  lib.GlobalWorkerOptions.workerSrc = LIB.pdfWorker;
+  const pdf = await lib.getDocument({ data: new Uint8Array(buf), isEvalSupported: false, disableFontFace: true }).promise;
+  const lines = [];
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p);
+    const tc = await page.getTextContent();
+    const items = tc.items.filter(it => it.str && it.str.trim()).map(it => ({
+      x: it.transform[4], y: it.transform[5], w: it.width || 0, h: Math.abs(it.transform[3]) || it.height || 10, s: it.str
+    }));
+    items.sort((a, b) => b.y - a.y || a.x - b.x);
+    const pageLines = [];
+    for (const it of items) {
+      const L = pageLines[pageLines.length - 1];
+      if (L && Math.abs(L.y - it.y) <= Math.max(2, Math.min(L.h, it.h) * 0.45)) L.items.push(it);
+      else pageLines.push({ y: it.y, h: it.h, items: [it] });
+    }
+    for (const L of pageLines) {
+      L.items.sort((a, b) => a.x - b.x);
+      const cells = []; let cur = null;
+      for (const it of L.items) {
+        const gap = cur ? it.x - cur.end : Infinity;
+        if (cur && gap < Math.max(L.h * 1.0, 6)) {
+          const space = gap > L.h * 0.12 && !/\s$/.test(cur.s) && !/^\s/.test(it.s);
+          cur.s += (space ? ' ' : '') + it.s; cur.end = Math.max(cur.end, it.x + it.w);
+        } else { cur = { x: it.x, end: it.x + it.w, s: it.s }; cells.push(cur); }
+      }
+      lines.push({ cells, page: p });
+    }
+  }
+  if (!lines.length) throw new UserError('In deze PDF staat geen tekst die de app kan lezen (misschien is het een scan of foto). Vraag de lijst als Excel of Word, of typ hem over.');
+  // Find column starts that many lines share
+  const xs = lines.flatMap(l => l.cells.map(c => c.x)).sort((a, b) => a - b);
+  const clusters = [];
+  for (const x of xs) { const c = clusters[clusters.length - 1]; if (c && x - c.last <= 14) { c.n++; c.last = x; } else clusters.push({ start: x, last: x, n: 1 }); }
+  const minN = Math.max(2, Math.round(lines.length * 0.15));
+  const cols = clusters.filter(c => c.n >= minN).map(c => c.start);
+  if (cols.length <= 1) return { PDF: lines.map(l => [l.cells.map(c => c.s).join('   ')]) };
+  const rows = [];
+  for (const l of lines) {
+    const row = Array(cols.length).fill('');
+    for (const c of l.cells) {
+      let k = 0; for (let i = 0; i < cols.length; i++) if (c.x >= cols[i] - 8) k = i;
+      row[k] = row[k] ? row[k] + ' ' + c.s : c.s;
+    }
+    const prev = rows[rows.length - 1];
+    // A line that continues the previous row (e.g. a long sentence that wrapped)
+    if (prev && !row[0] && prev.page === l.page && row.some(Boolean)) {
+      row.forEach((v, i) => { if (v) prev.cells[i] = prev.cells[i] ? prev.cells[i] + ' ' + v : v; });
+      continue;
+    }
+    rows.push({ cells: row, page: l.page });
+  }
+  return { PDF: rows.map(r => r.cells) };
+}
+
+const SHEET_EXT = ['xlsx', 'xlsm', 'xlsb', 'xls', 'xltx', 'xltm', 'xlt', 'ods', 'fods', 'numbers', 'html', 'htm', 'xml', 'dif', 'sylk', 'slk', 'dbf', 'wk1', 'wks', 'qpw', 'et', 'eth'];
+const TEXT_EXT = ['csv', 'tsv', 'txt', 'tab', 'text', 'prn', 'md', 'rtf'];
+async function readFile(file) {
+  const buf = await file.arrayBuffer();
+  if (!buf.byteLength) throw new UserError('Dit bestand is leeg.');
+  const name = file.name || 'bestand';
+  const ext = name.includes('.') ? name.split('.').pop().toLowerCase() : '';
+  const base = name.replace(/\.[^.]+$/, '') || 'Lijst';
+  const h = new Uint8Array(buf.slice(0, 8));
+  const isZip = h[0] === 0x50 && h[1] === 0x4B, isPdf = h[0] === 0x25 && h[1] === 0x50 && h[2] === 0x44 && h[3] === 0x46;
+  const isOle = h[0] === 0xD0 && h[1] === 0xCF && h[2] === 0x11 && h[3] === 0xE0;
+  const isImg = (h[0] === 0xFF && h[1] === 0xD8) || (h[0] === 0x89 && h[1] === 0x50) || /^(jpe?g|png|heic|heif|gif|webp|bmp|tiff?)$/.test(ext);
+
+  if (isImg) throw new UserError('Foto\'s kan de app niet lezen. Gebruik een Excel-, Word-, PDF- of tekstbestand, of plak de woorden.');
+  if (ext === 'pages' || ext === 'key') throw new UserError('Pages-bestanden kan de app niet openen. Kies in Pages: Exporteer naar → Word (.docx) of PDF, en upload dat.');
+  if (isPdf) return readPdf(buf);
+  if (isZip && !SHEET_EXT.includes(ext)) {
+    const docSheets = await readZipDoc(buf);
+    if (docSheets) return docSheets;
+  }
+  if (ext === 'doc' && isOle) throw new UserError('Dit is een oud Word-bestand (.doc). Open het in Word en kies Opslaan als → .docx, of kopieer de tabel en gebruik Plakken.');
+  if (ext === 'rtf') {
+    const t = decodeText(buf).replace(/\\par[d]?/g, '\n').replace(/\\tab/g, '\t').replace(/\\cell/g, '\t').replace(/\\row/g, '\n').replace(/\{\\\*[^{}]*\}|\\[a-z]+-?\d* ?|[{}]/gi, '');
+    return { [base]: parseText(t) };
+  }
+  if (TEXT_EXT.includes(ext) || (!isZip && !isOle && !SHEET_EXT.includes(ext))) return { [base]: parseText(decodeText(buf)) };
+  if (!window.XLSX) throw new Error('nolib');
+  let wb;
+  try { wb = XLSX.read(new Uint8Array(buf), { type: 'array', dense: false }); }
+  catch (e) {
+    if (!isZip && !isOle) return { [base]: parseText(decodeText(buf)) };
+    throw new UserError('Dit Excel-bestand kon niet geopend worden. Misschien is het beveiligd met een wachtwoord? Sla het op zonder wachtwoord of als .csv.');
+  }
+  const sheets = {};
+  for (const nm of wb.SheetNames) {
+    const ws = wb.Sheets[nm]; if (!ws) continue;
+    sheets[nm] = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '', raw: false, blankrows: false });
+  }
+  return sheets;
+}
+
+/* ---------- wizard state ---------- */
+function startWizard(appendTo, folder) {
+  const d = appendTo ? getDeck(appendTo) : null;
+  wiz = {
+    step: d ? 2 : 1, append: d ? d.id : null, name: '', n: d ? d.n : 3, source: 'file', folder: folder || '',
+    paste: '', sheets: null, sheet: '', header: false, map: [], names: [], namesEdited: [], fileName: '', error: '', notes: null
+  };
+  view = { name: 'new' }; render(); scrollTo(0, 0);
+}
+
+function setSheets(sheets, label) {
+  const clean = {};
+  for (const k in sheets) { const t = cleanTable(sheets[k]); if (t.rows.length) clean[k] = t; }
+  const names = Object.keys(clean);
+  if (!names.length) { wiz.error = 'Er staan geen woorden of kolommen in dit bestand. Controleer of je lijst niet leeg is.'; render(); return; }
+  if (names.length > 1) {
+    const all = { rows: [], notes: { title: 0, numbering: false, split: false } };
+    names.forEach(k => { all.rows.push(...clean[k].rows); const nt = clean[k].notes; all.notes.title += nt.title; all.notes.numbering ||= nt.numbering; all.notes.split ||= nt.split; });
+    all.rows = padRows(all.rows);
+    clean.__all__ = all;
+  }
+  wiz.sheets = clean; wiz.fileName = label; wiz.error = '';
+  // Several tables with the same columns (e.g. one list over many pages)? Use them all together.
+  const widths = new Set(names.map(k => clean[k].rows[0].length));
+  wiz.sheet = names.length > 1 && widths.size === 1 && /^Tabel /.test(names[0]) ? '__all__' : names[0];
+  applySheet();
+}
+function curRows() { return wiz.sheets[wiz.sheet].rows; }
+function applySheet() {
+  const rows = curRows();
+  wiz.notes = wiz.sheets[wiz.sheet].notes;
+  wiz.cols = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  wiz.header = guessHeader(rows);
+  wiz.map = Array.from({ length: wiz.n }, (_, i) => (i < wiz.cols ? i : -1));
+  wiz.namesEdited = [];
+  if (wiz.append) wiz.names = getDeck(wiz.append).names.slice();
+  refreshNames();
+  wiz.step = 3; render(); scrollTo(0, 0);
+}
+function refreshNames() {
+  if (wiz.append) return;
+  const rows = curRows();
+  wiz.names = wiz.map.map((ci, i) => {
+    if (wiz.namesEdited[i]) return wiz.names[i];
+    if (wiz.header && ci >= 0 && rows[0][ci]) return rows[0][ci].slice(0, 40);
+    return DEFAULT_NAMES[i];
+  });
+}
+function wizardCards() {
+  const rows = curRows();
+  const headerKey = wiz.header ? rows[0].join('\u0001').toLowerCase() : null;
+  const body = wiz.header ? rows.slice(1) : rows;
+  const mapped = wiz.map.filter(ci => ci >= 0).length;
+  const seen = new Set(); const cards = []; let half = 0, dupes = 0;
+  for (const r of body) {
+    if (headerKey && r.join('\u0001').toLowerCase() === headerKey) continue; // repeated title row (next page / sheet)
+    const s = wiz.map.map(ci => (ci >= 0 ? (r[ci] || '') : ''));
+    const filledN = s.filter(Boolean).length;
+    if (!filledN) continue;
+    if (mapped >= 2 && filledN < 2) { half++; continue; }
+    const key = s.map(norm).join('\u0001');
+    if (seen.has(key)) { dupes++; continue; }
+    seen.add(key); cards.push(s);
+  }
+  return { cards, half, dupes };
+}
+
+/* =========================================================
+   Study logic (Anki-like learning steps)
+   - Again: back after ~3 other cards, streak reset
+   - Hard ("ken het, herhaal"): back after ~6 cards, streak reset
+   - Good: streak +1; known only after 2× good in a row,
+     with other cards in between (back after ~7 cards)
+   - Known cards come back after 1, 3, 8, 20… days
+   ========================================================= */
+const GAP = { again: 3, hard: 6, good: 7 };
+
+function startStudy(deckId, cram) {
+  const d = getDeck(deckId); if (!d) return;
+  const t = today();
+  let ids;
+  if (cram) ids = d.cards.map(c => c.id);
+  else {
+    const learn = [], rev = [], fresh = [];
+    for (const c of d.cards) {
+      if (c.st === 'learn') learn.push(c.id);
+      else if (c.st === 'review') { if (c.due <= t) rev.push(c.id); }
+      else fresh.push(c.id);
+    }
+    const lim = d.opt?.newLimit || 0;
+    const newIds = d.opt?.shuffle ? shuffle(fresh).slice(0, lim || undefined) : fresh.slice(0, lim || undefined);
+    ids = [...learn, ...rev, ...newIds];
+  }
+  if (d.opt?.shuffle) shuffle(ids);
+  session = { deckId, queue: ids, total: ids.length, answered: 0, side: 0, start: 0, revealed: false, anim: false,
+    st: { again: 0, hard: 0, good: 0, learned: 0 }, history: [], cram: !!cram };
+  if (!ids.length) { view = { name: 'done', empty: true, deckId }; render(); return; }
+  setStart();
+  d.last = Date.now(); Store.touch(d);
+  view = { name: 'study' }; render(); scrollTo(0, 0);
+}
+function setStart() {
+  const d = getDeck(session.deckId);
+  const s = d.opt?.start ?? 0;
+  session.start = s === -1 ? Math.floor(Math.random() * d.n) : Math.min(s, d.n - 1);
+  session.side = 0; session.revealed = false;
+}
+function currentCard() { const d = getDeck(session.deckId); return d && d.cards.find(c => c.id === session.queue[0]); }
+
+function goodPreview(c) {
+  if (c.st === 'review') { const iv = Math.max(c.iv + 1, Math.round(c.iv * 2.5)); return '+' + plural(iv, 'dag', 'dagen'); }
+  if (c.k >= 1) return 'gekend ✓';
+  return 'nog 1× juist';
+}
+
+function answer(grade) {
+  if (!session || !session.revealed) return;
+  const d = getDeck(session.deckId);
+  const c = currentCard(); if (!c) return;
+  session.history.push({ queue: session.queue.slice(), card: JSON.stringify(c), st: { ...session.st }, answered: session.answered });
+  if (session.history.length > 30) session.history.shift();
+  const cid = session.queue.shift();
+  c.reps++;
+  let gap = 0;
+  if (c.st === 'review') {
+    if (grade === 'good') { c.iv = Math.max(c.iv + 1, Math.round(c.iv * 2.5)); c.due = today() + c.iv; session.st.good++; }
+    else if (grade === 'hard') { c.st = 'learn'; c.k = 1; gap = GAP.hard; session.st.hard++; }
+    else { c.st = 'learn'; c.k = 0; c.iv = 0; c.lapses++; gap = GAP.again; session.st.again++; }
+  } else {
+    c.st = 'learn';
+    if (grade === 'good') {
+      c.k++; session.st.good++;
+      if (c.k >= 2) { c.st = 'review'; c.k = 0; c.iv = c.iv > 0 ? Math.max(1, Math.round(c.iv * 1.2)) : 1; c.due = today() + c.iv; session.st.learned++; }
+      else gap = GAP.good;
+    } else if (grade === 'hard') { c.k = 0; gap = GAP.hard; session.st.hard++; }
+    else { c.k = 0; gap = GAP.again; session.st.again++; }
+  }
+  if (gap) session.queue.splice(Math.min(gap, session.queue.length), 0, cid);
+  session.answered++;
+  Store.touch(d);
+  if (!session.queue.length) { view = { name: 'done', deckId: d.id }; render(); return; }
+  setStart(); session.anim = true; render();
+}
+function undo() {
+  if (!session || !session.history.length) return;
+  const h = session.history.pop();
+  const d = getDeck(session.deckId);
+  const saved = JSON.parse(h.card);
+  const c = d.cards.find(x => x.id === saved.id); if (c) Object.assign(c, saved);
+  session.queue = h.queue; session.st = h.st; session.answered = h.answered;
+  setStart(); session.revealed = true; session.side = 0;
+  Store.touch(d); view = { name: 'study' }; render();
+}
+function flip() {
+  if (!session) return;
+  const d = getDeck(session.deckId);
+  session.side = (session.side + 1) % d.n;
+  session.revealed = true; session.anim = true;
+  render();
+}
+
+function speak(text, lang) {
+  try {
+    const ss = window.speechSynthesis; if (!ss || !text) return;
+    ss.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    if (lang) {
+      u.lang = lang;
+      const vs = ss.getVoices();
+      const v = vs.find(v => v.lang.replace('_', '-').toLowerCase() === lang.toLowerCase()) || vs.find(v => v.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase()));
+      if (v) u.voice = v;
+    }
+    u.rate = 0.92; ss.speak(u);
+  } catch (e) { /* speech not available */ }
+}
+
+/* =========================================================
+   Export
+   ========================================================= */
+async function exportDeck(d, kind) {
+  const rows = [d.names.slice(0, d.n), ...d.cards.map(c => c.s.slice(0, d.n))];
+  const base = (d.name || 'flashcards').replace(/[\\/:*?"<>|]+/g, '').trim() || 'flashcards';
+  let data, filename;
+  if (kind === 'xlsx') {
+    if (!window.XLSX) { toast('De Excel-module is niet geladen. Probeer CSV.'); return; }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Kaarten');
+    data = new Uint8Array(XLSX.write(wb, { type: 'array', bookType: 'xlsx' }));
+    filename = base + '.xlsx';
+  } else {
+    const q = v => /[";\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    data = '﻿' + rows.map(r => r.map(v => q(String(v || ''))).join(';')).join('\r\n');
+    filename = base + '.csv';
+  }
+  await saveFile(filename, data, kind === 'xlsx' ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' : 'text/csv;charset=utf-8');
+}
+
+async function saveFile(filename, data, mime) {
+  let dl = null;
+  try { if (window.claude && claude.use) dl = await claude.use('downloads'); } catch (e) { dl = null; }
+  if (dl) {
+    try { await dl.save({ filename, data: data instanceof Uint8Array ? new Blob([data]) : data }); toast('Bestand opgeslagen'); }
+    catch (e) { if (e && e.code !== 'declined') toast('Downloaden lukte niet hier.'); }
+    return;
+  }
+  const blob = new Blob([data], { type: mime });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+/* ---------- Back-up of everything (to move to another device) ---------- */
+async function exportBackup() {
+  const stamp = new Date().toISOString().slice(0, 10);
+  const data = JSON.stringify({ app: 'luca-flashcards', version: 1, exported: Date.now(), folders, decks });
+  await saveFile(`luca-flashcards-backup-${stamp}.json`, data, 'application/json');
+}
+async function importBackup(file) {
+  try {
+    const obj = JSON.parse(decodeText(await file.arrayBuffer()));
+    if (!obj || obj.app !== 'luca-flashcards' || !Array.isArray(obj.decks)) throw new Error('bad');
+    let added = 0, updated = 0;
+    for (const f of obj.folders || []) if (f && f.id && !getFolder(f.id)) folders.push(f);
+    Store.touchFolders();
+    for (const d of obj.decks) {
+      if (!d || !d.id || !Array.isArray(d.cards)) continue;
+      Store.tombs.delete(d.id);
+      const i = decks.findIndex(x => x.id === d.id);
+      if (i < 0) { decks.push(d); added++; Store.touch(d); }
+      else if ((d.updated || 0) > (decks[i].updated || 0)) { decks[i] = d; updated++; Store.touch(d); }
+    }
+    render();
+    toast(added || updated ? `Back-up teruggezet: ${plural(added, 'nieuwe set', 'nieuwe sets')}${updated ? `, ${updated} bijgewerkt` : ''}` : 'Alles uit deze back-up stond er al');
+  } catch (e) { toast('Dit is geen back-up van Luca Flashcards.'); }
+}
+
+/* ---------- Install as an app (only outside claude.ai) ---------- */
+let installPrompt = null;
+const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function installHint() {
+  if (window.claude || isStandalone()) return '';
+  if (installPrompt) return `<button class="btn block install-btn" data-act="install">📲 Installeer Luca Flashcards als app</button>`;
+  if (isIOS()) return `<p class="install-tip">📲 <b>Installeren op iPhone:</b> tik in Safari op het Deel-icoon en kies <b>“Zet op beginscherm”</b>.</p>`;
+  return '';
+}
+
+/* =========================================================
+   Views
+   ========================================================= */
+const brandSvg = `<svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true"><rect x="9" y="5" width="30" height="22" rx="4" transform="rotate(8 24 16)" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/><rect x="5" y="14" width="30" height="22" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="2"/><line x1="5" y1="21" x2="35" y2="21" stroke="var(--rule-red)" stroke-width="2"/><line x1="10" y1="27" x2="30" y2="27" stroke="var(--rule-blue)" stroke-width="2"/><line x1="10" y1="31" x2="24" y2="31" stroke="var(--rule-blue)" stroke-width="2"/></svg>`;
+const FOLDER_COLORS = 6;
+let homeFolder = null;
+
+const getFolder = id => folders.find(f => f.id === id);
+const deckFolder = d => (d.folder && getFolder(d.folder)) ? d.folder : '';
+const byRecent = (a, b) => Math.max(b.last || 0, b.created || 0) - Math.max(a.last || 0, a.created || 0);
+const folderOptions = (sel) => `<option value=""${!sel ? ' selected' : ''}>Geen map</option>` +
+  folders.map(f => `<option value="${f.id}"${sel === f.id ? ' selected' : ''}>${esc(f.name)}</option>`).join('') +
+  `<option value="__new__">+ Nieuwe map…</option>`;
+
+function deckCard(d) {
+  const s = deckStats(d);
+  const pk = s.total ? (s.kn / s.total * 100) : 0, pl = s.total ? (s.lr / s.total * 100) : 0;
+  const todo = s.todo
+    ? `<b>${s.todo}</b> te oefenen vandaag`
+    : (s.total ? `Klaar voor vandaag${s.tomorrow ? ` · morgen ${s.tomorrow}` : ''}` : 'Nog geen kaarten');
+  return `<article class="deck">
+    <button class="deck-main" data-act="study" data-id="${d.id}" aria-label="Oefen ${esc(d.name)}">
+      <h2>${esc(d.name)}</h2>
+      <p class="meta">${d.n} kanten · ${plural(s.total, 'kaart', 'kaarten')} · ${d.names.slice(0, d.n).map(esc).join(' → ')}</p>
+      <div class="meter" aria-hidden="true"><span class="m-known" style="width:${pk}%"></span><span class="m-learn" style="width:${pl}%"></span></div>
+      <div class="legend"><span><i class="dot k"></i>Gekend <b>${s.kn}</b></span><span><i class="dot l"></i>Aan het leren <b>${s.lr}</b></span><span><i class="dot n"></i>Nieuw <b>${s.nw}</b></span></div>
+    </button>
+    <div class="deck-foot">
+      <span class="todo">${todo}</span>
+      <div class="acts">
+        <button class="btn ghost sm" data-act="edit" data-id="${d.id}">Bewerken</button>
+        ${s.todo ? `<button class="btn primary sm" data-act="study" data-id="${d.id}">Oefenen</button>`
+                 : `<button class="btn sm" data-act="cram" data-id="${d.id}" ${s.total ? '' : 'disabled'}>Alles oefenen</button>`}
+      </div>
+    </div>
+  </article>`;
+}
+
+function newFolderForm() {
+  return `<form class="card-box folder-form" data-form="new-folder">
+      <label class="lbl" for="f-name">Naam van de map</label>
+      <input class="field" id="f-name" placeholder="bv. Spaans, Economie, Geschiedenis" autocomplete="off" maxlength="40">
+      <div class="btn-row"><button class="btn primary sm" type="submit">Map maken</button><button class="btn sm" type="button" data-act="folder-cancel">Annuleren</button></div>
+    </form>`;
+}
+
+function renderHome() {
+  const [cls, txt] = syncInfo();
+  const fid = view.folder && getFolder(view.folder) ? view.folder : null;
+  if (fid) return renderFolder(fid);
+
+  const loose = decks.filter(d => !deckFolder(d)).sort(byRecent);
+  const tiles = folders.map(f => {
+    const ds = decks.filter(d => d.folder === f.id);
+    const todo = ds.reduce((a, d) => a + deckStats(d).todo, 0);
+    const cards = ds.reduce((a, d) => a + d.cards.length, 0);
+    return `<button class="folder c${f.c % FOLDER_COLORS}" data-act="open-folder" data-id="${f.id}">
+        <span class="folder-tab" aria-hidden="true"></span>
+        <span class="folder-name">${esc(f.name)}</span>
+        <span class="folder-meta">${plural(ds.length, 'set', 'sets')} · ${plural(cards, 'kaart', 'kaarten')}</span>
+        <span class="folder-todo">${todo ? `<b>${todo}</b> te oefenen` : (ds.length ? 'Klaar voor vandaag' : 'Nog leeg')}</span>
+      </button>`;
+  }).join('');
+
+  const empty = `<section class="empty">
+      <h2>Maak je eerste set flashcards</h2>
+      <p class="muted">Zet je woorden in een tabel zoals hieronder: elke kolom wordt één kant van de kaart. Upload daarna je bestand (Excel, CSV, Word, PDF, Numbers …) of kopieer en plak de cellen.</p>
+      <div class="sheet-demo"><table>
+        <tr><th class="rn"></th><th>A</th><th>B</th><th>C</th></tr>
+        <tr><td class="rn">1</td><td><b>Spaans</b></td><td><b>Engels</b></td><td><b>Zin</b></td></tr>
+        <tr><td class="rn">2</td><td>el perro</td><td>dog</td><td>El perro duerme en el sofá.</td></tr>
+        <tr><td class="rn">3</td><td>correr</td><td>to run</td><td>Me gusta correr en el parque.</td></tr>
+        <tr><td class="rn">4</td><td>la playa</td><td>beach</td><td>En verano vamos a la playa.</td></tr>
+      </table></div>
+      <button class="btn block" data-act="sample">Probeer een voorbeeldset (Spaans, 3 kanten)</button>
+    </section>`;
+
+  let main = '';
+  if (folders.length) {
+    main += `<p class="section-title">Mappen</p><section class="folders">${tiles}</section>`;
+    if (loose.length) main += `<p class="section-title">Sets zonder map</p><section class="decks">${loose.map(deckCard).join('')}</section>`;
+  } else if (decks.length) {
+    main += `<section class="decks">${loose.map(deckCard).join('')}</section>`;
+  } else main = empty;
+
+  return `<header class="home-head">
+      <div class="brand">${brandSvg}<div><h1>Luca Flashcards</h1><p>Je sets en mappen</p></div></div>
+      <span id="sync" class="sync ${cls}"><i></i>${esc(txt)}</span>
+    </header>
+    <div class="home-actions">
+      <button class="btn primary new-btn" data-act="new">+ Nieuwe set</button>
+      <button class="btn new-btn" data-act="folder-new">+ Nieuwe map</button>
+    </div>
+    ${installHint()}
+    ${view.newFolder ? newFolderForm() : ''}
+    ${main}
+    <div class="backup-row">
+      <button class="btn ghost sm" data-act="backup">Back-up maken</button>
+      <label class="btn ghost sm" for="backup-file">Back-up terugzetten<input type="file" id="backup-file" accept=".json,application/json" hidden></label>
+    </div>
+    ${window.claude ? `<div class="zip-box">
+      <div><b>Offline-app downloaden</b><p class="muted small">Een versie om te installeren die zonder internet werkt. Pak de zip uit en zet de bestanden op GitHub Pages (uitleg in README.md).</p></div>
+      <button class="btn primary sm" data-act="app-zip">⬇ Download zip</button>
+    </div>` : ''}
+    <footer class="footer">Made by <b>Luca Cicarelli</b></footer>`;
+}
+
+function renderFolder(fid) {
+  const f = getFolder(fid);
+  const ds = decks.filter(d => d.folder === fid).sort(byRecent);
+  const manage = view.rename
+    ? `<form class="card-box" data-form="rename-folder">
+        <label class="lbl" for="f-rename">Nieuwe naam</label>
+        <input class="field" id="f-rename" value="${esc(f.name)}" maxlength="40">
+        <div class="btn-row"><button class="btn primary sm" type="submit">Opslaan</button><button class="btn sm" type="button" data-act="folder-manage-cancel">Annuleren</button></div>
+      </form>`
+    : view.confirm === 'folder'
+      ? `<div class="card-box danger-zone"><p>Map <b>${esc(f.name)}</b> verwijderen? ${ds.length ? `De ${plural(ds.length, 'set', 'sets')} erin blijven bewaard bij “Sets zonder map”.` : ''}</p>
+          <div class="btn-row"><button class="btn sm danger solid" data-act="folder-delete-yes">Ja, map verwijderen</button><button class="btn sm" data-act="folder-manage-cancel">Annuleren</button></div></div>`
+      : '';
+  return `<header class="bar"><button class="icon-btn" data-act="folder-back" aria-label="Terug naar alle mappen">←</button>
+      <h1 class="folder-title c${f.c % FOLDER_COLORS}"><i aria-hidden="true"></i>${esc(f.name)}</h1></header>
+    <div class="home-actions">
+      <button class="btn primary new-btn" data-act="new">+ Nieuwe set in deze map</button>
+    </div>
+    <div class="btn-row folder-tools">
+      <button class="btn ghost sm" data-act="folder-rename">Hernoemen</button>
+      <button class="btn ghost sm" data-act="folder-delete">Map verwijderen</button>
+    </div>
+    ${manage}
+    <section class="decks">${ds.length ? ds.map(deckCard).join('') : `<div class="empty"><p class="muted">Nog geen sets in deze map. Maak er hierboven een, of verplaats een bestaande set via <b>Bewerken → Map</b>.</p></div>`}</section>
+    <footer class="footer">Made by <b>Luca Cicarelli</b></footer>`;
+}
+
+function moveButtons(i, n, act) {
+  return `<span class="mover">
+      <button class="icon-btn sm-icon" data-act="${act}" data-i="${i}" data-dir="-1" aria-label="Kant ${i + 1} naar voren" ${i === 0 ? 'disabled' : ''}>↑</button>
+      <button class="icon-btn sm-icon" data-act="${act}" data-i="${i}" data-dir="1" aria-label="Kant ${i + 1} naar achteren" ${i === n - 1 ? 'disabled' : ''}>↓</button>
+    </span>`;
+}
+function sideHead(i, n, act) {
+  return `<div class="side-head"><span class="num">Kant ${i + 1}${i === 0 ? ' <em>· zie je eerst</em>' : ''}</span>${moveButtons(i, n, act)}</div>`;
+}
+
+function renderWizard() {
+  const w = wiz;
+  const deck = w.append ? getDeck(w.append) : null;
+  const title = deck ? 'Kaarten toevoegen' : 'Nieuwe set';
+  const stepTxt = deck ? '' : `<span class="step">Stap ${w.step} van 3</span>`;
+  const back = w.step === 1 || (deck && w.step === 2) ? (deck ? 'edit-back' : 'home') : 'wiz-back';
+  let body = '';
+
+  if (w.step === 1) {
+    const ex = { 2: 'woord → uitleg', 3: 'woord → uitleg → zin', 4: 'woord → uitleg → zin → extra' };
+    body = `<div class="card-box">
+        <label class="lbl" for="w-name">Naam van de set</label>
+        <input class="field" id="w-name" data-wiz="name" value="${esc(w.name)}" placeholder="bv. Spaans – hoofdstuk 3" autocomplete="off">
+        <label class="lbl" for="w-folder">Map</label>
+        <select class="field" id="w-folder">${folderOptions(w.folder)}</select>
+      </div>
+      <div class="card-box">
+        <p class="lbl">Hoeveel kanten heeft elke kaart?</p>
+        <p class="help">Elke kolom uit je lijst wordt één kant. Spaans, uitleg en zin? Kies 3. De volgorde kies je straks zelf.</p>
+        <div class="sides-pick">${[2, 3, 4].map(n => `<button class="pick" data-act="wiz-n" data-n="${n}" aria-pressed="${w.n === n}">
+            <span class="stack">${Array.from({ length: n }, (_, i) => `<span style="left:${i * 6}px;top:${(n - 1 - i) * 5}px"></span>`).join('')}</span>
+            <b>${n} kanten</b><small>${ex[n]}</small></button>`).join('')}</div>
+      </div>
+      <button class="btn primary block" data-act="wiz-next">Verder</button>`;
+  } else if (w.step === 2) {
+    const tab = (k, t) => `<button role="tab" aria-selected="${w.source === k}" data-act="wiz-src" data-src="${k}">${t}</button>`;
+    let src = '';
+    if (w.source === 'file') {
+      src = `<label class="drop${w.loading ? ' busy' : ''}" id="drop" for="w-file">
+          <input type="file" id="w-file">
+          <span class="big" aria-hidden="true">${w.loading ? '⏳' : '⬆'}</span>
+          <strong>${w.loading ? 'Bestand lezen…' : 'Kies je bestand'}</strong>
+          <span class="muted small">Excel · CSV · Word · PDF · Numbers · OpenOffice · tekst<br>of sleep het hierheen</span>
+        </label>`;
+    } else if (w.source === 'paste') {
+      src = `<div class="card-box">
+          <label class="lbl" for="w-paste">Plak je lijst</label>
+          <p class="help">Kopieer cellen uit Excel, Numbers of Google Sheets, of een lijstje zoals <i>el perro = dog</i> of <i>correr - to run</i>, en plak hieronder.</p>
+          <textarea class="field" id="w-paste" data-wiz="paste" placeholder="el perro&#9;dog&#9;El perro duerme en el sofá.">${esc(w.paste)}</textarea>
+          <button class="btn primary block" data-act="wiz-paste">Verder</button>
+        </div>`;
+    } else {
+      src = `<div class="card-box">
+          <p class="lbl">Kaarten zelf intypen</p>
+          <p class="help" style="margin-top:0">${deck ? 'Je krijgt lege kaarten om in te vullen.' : `Je krijgt een lege set met ${w.n} kanten waarin je kaarten kunt typen.`}</p>
+          <button class="btn primary block" data-act="wiz-manual">${deck ? 'Lege kaart toevoegen' : 'Lege set maken'}</button>
+        </div>`;
+    }
+    body = `<p class="muted">${deck ? `Toevoegen aan <b>${esc(deck.name)}</b> (${deck.n} kanten).` : `Je set krijgt <b>${w.n} kanten</b>. Elke kolom wordt één kant.`}</p>
+      <div class="tabs" role="tablist">${tab('file', 'Bestand')}${tab('paste', 'Plakken')}${tab('manual', 'Zelf typen')}</div>
+      ${w.error ? `<p class="error" role="alert">${esc(w.error)}</p>` : ''}
+      ${src}`;
+  } else {
+    const rows = curRows();
+    const { cards, half, dupes } = wizardCards();
+    const sheetNames = Object.keys(w.sheets).filter(k => k !== '__all__');
+    const allLabel = /^Tabel /.test(sheetNames[0] || '') ? 'Alle tabellen samen' : 'Alle werkbladen samen';
+    const colOpts = (sel) => `<option value="-1"${sel === -1 ? ' selected' : ''}>(leeg laten)</option>` +
+      Array.from({ length: w.cols }, (_, ci) => {
+        const sample = (w.header ? rows[0][ci] : (rows.find(r => r[ci]) || [])[ci]) || '';
+        return `<option value="${ci}"${sel === ci ? ' selected' : ''}>Kolom ${colLetter(ci)}${sample ? ' – ' + esc(sample.slice(0, 22)) : ''}</option>`;
+      }).join('');
+    let warn = '';
+    if (w.cols < w.n) {
+      warn = `<div class="warn"><span>Je lijst heeft maar <b>${w.cols} ${w.cols === 1 ? 'kolom' : 'kolommen'}</b>, maar je koos ${w.n} kanten. ${w.n - w.cols === 1 ? 'Eén kant blijft' : 'Sommige kanten blijven'} leeg.</span>
+        ${!w.append && w.cols >= 2 ? `<button class="btn sm" data-act="wiz-fit">Gebruik ${w.cols} kanten</button>` : ''}</div>`;
+    } else if (w.cols > w.n) {
+      warn = `<div class="warn"><span>Je lijst heeft <b>${w.cols} kolommen</b> en je koos ${w.n} kanten. Kies hieronder welke kolommen je gebruikt.</span>
+        ${!w.append && w.cols <= 4 ? `<button class="btn sm" data-act="wiz-fit">Gebruik alle ${w.cols} kolommen</button>` : ''}</div>`;
+    }
+    const nt = w.notes || {};
+    const fixes = [];
+    if (nt.title) fixes.push(nt.title === 1 ? 'titel bovenaan overgeslagen' : `${nt.title} titelregels overgeslagen`);
+    if (nt.numbering) fixes.push('nummering weggehaald');
+    if (nt.split) fixes.push('woord en uitleg uit elkaar gehaald');
+    if (half) fixes.push(`${plural(half, 'halve rij', 'halve rijen')} overgeslagen`);
+    if (dupes) fixes.push(`${plural(dupes, 'dubbele kaart', 'dubbele kaarten')} overgeslagen`);
+    const prev = cards.slice(0, 5);
+    body = `<p class="found">Gevonden in <b>${esc(w.fileName)}</b>: ${plural(w.cols, 'kolom', 'kolommen')} en ${plural(rows.length, 'rij', 'rijen')}.</p>
+      ${fixes.length ? `<p class="fixed">Automatisch opgeschoond: ${fixes.join(' · ')}.</p>` : ''}
+      ${sheetNames.length > 1 ? `<div class="card-box"><label class="lbl" for="w-sheet">Welk deel van het bestand?</label><select class="field" id="w-sheet">
+          <option value="__all__"${w.sheet === '__all__' ? ' selected' : ''}>${allLabel}</option>
+          ${sheetNames.map(s => `<option value="${esc(s)}"${s === w.sheet ? ' selected' : ''}>${esc(s)}</option>`).join('')}</select></div>` : ''}
+      ${warn}
+      <div class="card-box">
+        <label class="check"><input type="checkbox" id="w-header" ${w.header ? 'checked' : ''}> Eerste rij is een titelrij (wordt geen kaart)</label>
+      </div>
+      <div class="card-box">
+        <p class="lbl">Welke kolom komt op welke kant?</p>
+        <p class="help">Kant 1 zie je eerst. Staat de taal die je moet kennen in de verkeerde kolom? Verschuif de kanten met ↑ ↓ of wissel ze om.</p>
+        ${w.map.map((ci, i) => `<div class="map-row">${sideHead(i, w.n, 'wiz-move')}
+          <input class="field" data-wiz-name="${i}" value="${esc(w.names[i])}" aria-label="Naam van kant ${i + 1}" ${w.append ? 'disabled' : ''}>
+          <select class="field" data-wiz-col="${i}" aria-label="Kolom voor kant ${i + 1}">${colOpts(ci)}</select></div>`).join('')}
+        <button class="btn sm swap-btn" data-act="wiz-move" data-i="0" data-dir="1">⇅ Wissel kant 1 en 2</button>
+      </div>
+      <p class="lbl">Zo worden je kaarten</p>
+      <div class="preview"><table><thead><tr>${w.names.map((n, i) => `<th>${i + 1}. ${esc(n)}</th>`).join('')}</tr></thead>
+        <tbody>${prev.map(r => `<tr>${r.map(v => `<td>${esc(v) || '<span class="muted">—</span>'}</td>`).join('')}</tr>`).join('') || `<tr><td colspan="${w.n}" class="muted">Geen kaarten gevonden. Kies andere kolommen of zet het vinkje voor de titelrij uit.</td></tr>`}</tbody></table></div>
+      ${cards.length > 5 ? `<p class="muted small">…en nog ${cards.length - 5} meer.</p>` : ''}
+      <div class="sticky-save"><button class="btn primary block" data-act="wiz-save" ${cards.length ? '' : 'disabled'}>${w.append ? `${plural(cards.length, 'kaart', 'kaarten')} toevoegen` : `Set opslaan · ${plural(cards.length, 'kaart', 'kaarten')}`}</button></div>`;
+  }
+  return `<header class="bar"><button class="icon-btn" data-act="${back}" aria-label="Terug">←</button><h1>${title}</h1>${stepTxt}</header>
+    <section class="panel">${body}</section>`;
+}
+
+function renderEdit() {
+  const d = getDeck(view.deckId); if (!d) { view = { name: 'home', folder: homeFolder }; return renderHome(); }
+  const s = deckStats(d);
+  const langSel = (i) => `<select class="field" data-deck-lang="${i}" aria-label="Voorlezen kant ${i + 1}">${LANGS.map(([v, t]) => `<option value="${v}"${(d.langs[i] || '') === v ? ' selected' : ''}>${t}</option>`).join('')}</select>`;
+  const stLabel = c => c.st === 'new' ? 'nieuw' : c.st === 'learn' ? `aan het leren (${c.k}/2)` : `gekend · over ${Math.max(0, c.due - today())} d`;
+  const rows = d.cards.map((c, idx) => `<div class="card-row" data-row="${c.id}">
+      <span class="idx">${idx + 1}</span>
+      <div class="fields">${Array.from({ length: d.n }, (_, i) => `<input class="field" data-card="${c.id}" data-side="${i}" value="${esc(c.s[i] || '')}" placeholder="${esc(d.names[i])}" aria-label="${esc(d.names[i])}, kaart ${idx + 1}">`).join('')}
+        <span class="st">${stLabel(c)}</span></div>
+      <button class="icon-btn" data-act="del-card" data-id="${c.id}" aria-label="Verwijder kaart ${idx + 1}">×</button>
+    </div>`).join('');
+  const opt = d.opt || {};
+  return `<header class="bar"><button class="icon-btn" data-act="home" aria-label="Terug">←</button><h1>Set bewerken</h1>
+      <button class="btn primary sm" data-act="study" data-id="${d.id}" ${s.todo ? '' : 'hidden'}>Oefenen</button></header>
+    <section class="panel">
+      <div class="card-box">
+        <label class="lbl" for="e-name">Naam</label>
+        <input class="field" id="e-name" data-deck-field="name" value="${esc(d.name)}">
+        <label class="lbl" for="e-folder">Map</label>
+        <select class="field" id="e-folder">${folderOptions(deckFolder(d))}</select>
+      </div>
+      <div class="card-box">
+        <p class="lbl">Volgorde van de kanten</p>
+        <p class="help">Kant 1 zie je eerst, daarna kant 2, enzovoort. Verschuif met ↑ ↓; je voortgang blijft bewaard.</p>
+        <p class="order-line">${d.names.slice(0, d.n).map((n, i) => `<span>${i + 1}. ${esc(n)}</span>`).join('<i aria-hidden="true">→</i>')}</p>
+        ${Array.from({ length: d.n }, (_, i) => `<div class="side-row">${sideHead(i, d.n, 'side-move')}
+          <input class="field" data-deck-name="${i}" value="${esc(d.names[i])}" aria-label="Naam kant ${i + 1}">${langSel(i)}</div>`).join('')}
+        <button class="btn sm swap-btn" data-act="side-move" data-i="0" data-dir="1">⇅ Wissel kant 1 en 2</button>
+        <p class="help" style="margin-top:0">Het tweede vakje per kant is de taal voor de 🔊 voorleesknop.</p>
+      </div>
+      <div class="card-box">
+        <p class="lbl">Oefenen</p>
+        <div class="opts">
+          <div><label class="small muted" for="o-new">Nieuwe kaarten per dag</label>
+            <select class="field" id="o-new" data-opt="newLimit">${[10, 20, 30, 50, 100, 0].map(v => `<option value="${v}"${(opt.newLimit ?? 30) === v ? ' selected' : ''}>${v || 'Allemaal'}</option>`).join('')}</select></div>
+          <div><label class="small muted" for="o-start">Begin met kant</label>
+            <select class="field" id="o-start" data-opt="start">${d.names.slice(0, d.n).map((n, i) => `<option value="${i}"${(opt.start ?? 0) === i ? ' selected' : ''}>${i + 1}: ${esc(n)}</option>`).join('')}<option value="-1"${opt.start === -1 ? ' selected' : ''}>Willekeurig</option></select></div>
+        </div>
+        <label class="check"><input type="checkbox" data-opt="shuffle" ${opt.shuffle ? 'checked' : ''}> Kaarten door elkaar schudden</label>
+      </div>
+      <div class="btn-row">
+        <button class="btn sm" data-act="add-import" data-id="${d.id}">+ Kaarten importeren</button>
+        <button class="btn sm" data-act="export" data-kind="xlsx">Exporteer .xlsx</button>
+        <button class="btn sm" data-act="export" data-kind="csv">Exporteer .csv</button>
+      </div>
+      <p class="section-title">${plural(d.cards.length, 'kaart', 'kaarten')}</p>
+      <input class="field" id="e-filter" placeholder="Zoek in je kaarten…" aria-label="Zoek in kaarten">
+      <div class="card-list" id="card-list">${rows}</div>
+      <button class="btn block" data-act="add-card">+ Kaart toevoegen</button>
+      <div class="card-box danger-zone">
+        <p class="lbl">Opnieuw beginnen of verwijderen</p>
+        <div class="btn-row">
+          ${view.confirm === 'reset'
+            ? `<button class="btn sm danger solid" data-act="reset-yes">Ja, alle voortgang wissen</button><button class="btn sm" data-act="confirm-no">Annuleren</button>`
+            : `<button class="btn sm danger" data-act="ask" data-what="reset">Voortgang resetten</button>`}
+          ${view.confirm === 'delete'
+            ? `<button class="btn sm danger solid" data-act="delete-yes">Ja, set verwijderen</button><button class="btn sm" data-act="confirm-no">Annuleren</button>`
+            : `<button class="btn sm danger" data-act="ask" data-what="delete">Set verwijderen</button>`}
+        </div>
+      </div>
+    </section>`;
+}
+
+function textSize(t) { const n = t.length; return n <= 18 ? 's1' : n <= 45 ? 's2' : n <= 120 ? 's3' : 's4'; }
+
+function renderStudy() {
+  const d = getDeck(session.deckId); const c = currentCard();
+  if (!d || !c) { view = { name: 'home', folder: homeFolder }; return renderHome(); }
+  const sideIdx = (session.start + session.side) % d.n;
+  const text = c.s[sideIdx] || '';
+  const uniq = [...new Set(session.queue)].map(id => d.cards.find(x => x.id === id)).filter(Boolean);
+  const cNew = uniq.filter(x => x.st === 'new').length, cLearn = uniq.filter(x => x.st === 'learn').length, cRev = uniq.filter(x => x.st === 'review').length;
+  const pct = session.total ? Math.min(100, Math.round((session.total - uniq.length) / session.total * 100)) : 0;
+  const chip = c.st === 'new' ? `<span class="chip new">Nieuw</span>`
+    : c.st === 'learn' ? `<span class="chip learn">Leren <i class="pip ${c.k >= 1 ? 'on' : ''}"></i><i class="pip"></i></span>`
+    : `<span class="chip review">Herhaling</span>`;
+  const lang = d.langs[sideIdx];
+  const canSpeak = !!(lang && text && window.speechSynthesis);
+  const answers = session.revealed
+    ? `<div class="answers">
+        <button class="ans again" data-act="ans" data-g="again"><span class="lbl-t">Nog niet</span><small>komt snel terug</small></button>
+        <button class="ans hard" data-act="ans" data-g="hard"><span class="lbl-t">Ken het, herhaal</span><small>komt later terug</small></button>
+        <button class="ans good" data-act="ans" data-g="good"><span class="lbl-t">Ik ken het</span><small>${esc(goodPreview(c))}</small></button>
+      </div>`
+    : `<div class="answers single"><button class="btn primary flip-btn" data-act="flip">Draai om</button></div>`;
+  const anim = session.anim; session.anim = false;
+  return `<div class="study">
+    <header class="bar">
+      <button class="icon-btn" data-act="study-exit" aria-label="Stoppen">✕</button>
+      <div class="title"><b>${esc(d.name)}</b>
+        <span class="counts"><span class="c-new">${cNew} nieuw</span><span class="c-learn">${cLearn} leren</span><span class="c-rev">${cRev} herhalen</span></span></div>
+      <button class="icon-btn" data-act="undo" aria-label="Vorige antwoord ongedaan maken" title="Ongedaan maken" ${session.history.length ? '' : 'disabled'}>↶</button>
+    </header>
+    <div class="progress" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"><span style="width:${pct}%"></span></div>
+    <div class="stage"><div class="card-wrap">
+      <button class="flash${anim ? ' anim' : ''}" data-act="flip" aria-label="Kaart: ${esc(d.names[sideIdx])}. Tik om om te draaien.">
+        <div class="flash-top"><span class="side-label">${esc(d.names[sideIdx])}</span>${chip}</div>
+        <div class="flash-body"><p class="flash-text ${text ? textSize(text) : 'blank'}">${text ? esc(text) : '(deze kant is leeg)'}</p></div>
+        <div class="flash-foot">
+          <span class="side-dots" aria-hidden="true">${Array.from({ length: d.n }, (_, i) => `<span class="${i === session.side ? 'on' : ''}"></span>`).join('')}</span>
+          <span class="tap-hint">${session.revealed ? 'tik voor de volgende kant' : 'tik om om te draaien'}</span>
+        </div>
+      </button>
+      ${canSpeak ? `<button class="speak" data-act="speak" aria-label="Lees voor">🔊</button>` : ''}
+    </div></div>
+    ${answers}
+  </div>`;
+}
+
+function renderDone() {
+  const d = getDeck(view.deckId); if (!d) { view = { name: 'home', folder: homeFolder }; return renderHome(); }
+  const s = deckStats(d);
+  if (view.empty) {
+    return `<section class="done">
+      <h1>Niets meer te oefenen vandaag</h1>
+      <p class="muted">Alle kaarten van <b>${esc(d.name)}</b> zijn bij. ${s.tomorrow ? `Morgen komen er ${s.tomorrow} terug.` : ''}</p>
+      <div class="btns"><button class="btn primary" data-act="cram" data-id="${d.id}">Toch alles oefenen</button><button class="btn" data-act="home">Terug naar mijn sets</button></div>
+    </section>`;
+  }
+  const st = session ? session.st : { again: 0, hard: 0, good: 0, learned: 0 };
+  return `<section class="done">
+    <h1>Ronde klaar!</h1>
+    <p class="muted">${esc(d.name)}</p>
+    <div class="stats">
+      <div class="stat"><b>${session ? session.answered : 0}</b><span>antwoorden</span></div>
+      <div class="stat"><b style="color:var(--good)">${st.learned}</b><span>nu gekend</span></div>
+      <div class="stat"><b style="color:var(--again)">${st.again}</b><span>nog niet</span></div>
+    </div>
+    <p>${s.tomorrow ? `Morgen komen <b>${s.tomorrow}</b> kaarten terug om te herhalen.` : 'Kom morgen terug om te herhalen.'}</p>
+    <div class="btns"><button class="btn primary" data-act="home">Terug naar mijn sets</button><button class="btn" data-act="cram" data-id="${d.id}">Alles nog eens oefenen</button></div>
+  </section>`;
+}
+
+function render() {
+  const v = view.name;
+  app.innerHTML = v === 'new' ? renderWizard() : v === 'edit' ? renderEdit() : v === 'study' ? renderStudy() : v === 'done' ? renderDone() : renderHome();
+}
+
+/* =========================================================
+   Events
+   ========================================================= */
+function swapAt(a, i, j) { const t = a[i]; a[i] = a[j]; a[j] = t; }
+function moveDeckSide(d, i, dir) {
+  const j = i + dir; if (j < 0 || j >= d.n) return;
+  while (d.langs.length < d.n) d.langs.push('');
+  swapAt(d.names, i, j); swapAt(d.langs, i, j);
+  d.cards.forEach(c => { while (c.s.length < d.n) c.s.push(''); swapAt(c.s, i, j); });
+  if (d.opt && d.opt.start === i) d.opt.start = j; else if (d.opt && d.opt.start === j) d.opt.start = i;
+}
+function createFolder(name) {
+  const f = { id: uid(), name: name.slice(0, 40), c: folders.length % FOLDER_COLORS, created: Date.now() };
+  folders.push(f); Store.touchFolders(); return f;
+}
+function goHome() { session = null; view = { name: 'home', folder: homeFolder }; render(); scrollTo(0, 0); }
+
+const ACT = {
+  home() { goHome(); },
+  new() { startWizard(null, view.name === 'home' ? (view.folder || '') : ''); },
+  sample() {
+    const rows = [
+      ['el perro', 'dog', 'El perro duerme en el sofá.'], ['la manzana', 'apple', 'Me como una manzana cada mañana.'],
+      ['correr', 'to run', 'Me gusta correr en el parque.'], ['la biblioteca', 'library', 'Estudio en la biblioteca los lunes.'],
+      ['cansado', 'tired', 'Estoy muy cansado después del partido.'], ['el mercado', 'market', 'Compramos fruta en el mercado.'],
+      ['aprender', 'to learn', 'Quiero aprender español este año.'], ['la playa', 'beach', 'En verano vamos a la playa.']
+    ];
+    const d = makeDeck('Voorbeeld – Spaans', 3, ['Spaans', 'Engels', 'Zin'], rows);
+    decks.push(d); Store.touch(d); render();
+  },
+  'open-folder'(el) { homeFolder = el.dataset.id; view = { name: 'home', folder: homeFolder }; render(); scrollTo(0, 0); },
+  'folder-back'() { homeFolder = null; view = { name: 'home' }; render(); scrollTo(0, 0); },
+  'folder-new'() { view.newFolder = true; render(); const i = document.getElementById('f-name'); if (i) i.focus(); },
+  'folder-cancel'() { view.newFolder = false; render(); },
+  'folder-rename'() { view.rename = true; view.confirm = null; render(); const i = document.getElementById('f-rename'); if (i) { i.focus(); i.select(); } },
+  'folder-delete'() { view.confirm = 'folder'; view.rename = false; render(); },
+  'folder-manage-cancel'() { view.confirm = null; view.rename = false; render(); },
+  'folder-delete-yes'() {
+    const f = getFolder(view.folder); if (!f) return;
+    decks.forEach(d => { if (d.folder === f.id) { d.folder = ''; Store.touch(d); } });
+    folders = folders.filter(x => x.id !== f.id); Store.touchFolders();
+    homeFolder = null; view = { name: 'home' }; render(); toast(`Map "${f.name}" verwijderd`);
+  },
+  study(el) { startStudy(el.dataset.id, false); },
+  cram(el) { startStudy(el.dataset.id, true); },
+  edit(el) { view = { name: 'edit', deckId: el.dataset.id }; render(); scrollTo(0, 0); },
+  'edit-back'() { const id = wiz && wiz.append; wiz = null; if (id) { view = { name: 'edit', deckId: id }; render(); } else goHome(); },
+  'wiz-back'() { wiz.error = ''; wiz.step = Math.max(wiz.append ? 2 : 1, wiz.step - 1); render(); },
+  'wiz-n'(el) { wiz.n = +el.dataset.n; render(); },
+  'wiz-next'() { if (!wiz.name.trim()) { const i = document.getElementById('w-name'); i.focus(); i.placeholder = 'Geef je set eerst een naam'; return; } wiz.step = 2; render(); },
+  'wiz-src'(el) { wiz.source = el.dataset.src; wiz.error = ''; render(); },
+  'wiz-paste'() {
+    if (!wiz.paste.trim()) { wiz.error = 'Plak eerst je lijst in het vak.'; render(); return; }
+    setSheets({ x: parseText(wiz.paste) }, 'je geplakte lijst');
+  },
+  'wiz-manual'() {
+    if (wiz.append) {
+      const d = getDeck(wiz.append); d.cards.push(newCard(Array(d.n).fill(''))); Store.touch(d);
+      view = { name: 'edit', deckId: d.id }; wiz = null; render(); focusLastCard(); return;
+    }
+    const names = DEFAULT_NAMES.slice(0, wiz.n);
+    const d = makeDeck(wiz.name.trim(), wiz.n, names, [Array(wiz.n).fill('')]);
+    d.folder = wiz.folder || '';
+    decks.push(d); Store.touch(d); wiz = null;
+    view = { name: 'edit', deckId: d.id }; render(); focusLastCard();
+  },
+  'wiz-fit'() {
+    wiz.n = Math.max(2, Math.min(4, wiz.cols));
+    wiz.map = Array.from({ length: wiz.n }, (_, i) => (i < wiz.cols ? i : -1));
+    wiz.namesEdited = []; refreshNames(); render();
+  },
+  'wiz-move'(el) {
+    const i = +el.dataset.i, j = i + (+el.dataset.dir); if (j < 0 || j >= wiz.n) return;
+    swapAt(wiz.map, i, j);
+    if (!wiz.append) { swapAt(wiz.names, i, j); swapAt(wiz.namesEdited, i, j); }
+    render();
+  },
+  'side-move'(el) {
+    const d = getDeck(view.deckId); moveDeckSide(d, +el.dataset.i, +el.dataset.dir); Store.touch(d);
+    const y = scrollY; render(); scrollTo(0, y);
+  },
+  'wiz-save'() {
+    const { cards } = wizardCards(); if (!cards.length) return;
+    if (wiz.append) {
+      const d = getDeck(wiz.append);
+      cards.forEach(s => d.cards.push(newCard(s))); Store.touch(d);
+      toast(`${plural(cards.length, 'kaart', 'kaarten')} toegevoegd`);
+      view = { name: 'edit', deckId: d.id };
+    } else {
+      const names = wiz.names.map((n, i) => (n || '').trim() || DEFAULT_NAMES[i]);
+      const d = makeDeck(wiz.name.trim(), wiz.n, names, cards);
+      d.folder = wiz.folder && getFolder(wiz.folder) ? wiz.folder : '';
+      decks.push(d); Store.touch(d);
+      toast(`Set "${d.name}" opgeslagen met ${plural(cards.length, 'kaart', 'kaarten')}`);
+      homeFolder = d.folder || null;
+      view = { name: 'home', folder: homeFolder };
+    }
+    wiz = null; render(); scrollTo(0, 0);
+  },
+  flip() { flip(); },
+  ans(el) { answer(el.dataset.g); },
+  undo() { undo(); },
+  speak() {
+    const d = getDeck(session.deckId), c = currentCard(); if (!c) return;
+    const i = (session.start + session.side) % d.n; speak(c.s[i], d.langs[i]);
+  },
+  'study-exit'() { Store.flush(); goHome(); },
+  'add-card'() { const d = getDeck(view.deckId); d.cards.push(newCard(Array(d.n).fill(''))); Store.touch(d); render(); focusLastCard(); },
+  'del-card'(el) {
+    const d = getDeck(view.deckId); d.cards = d.cards.filter(c => c.id !== el.dataset.id); Store.touch(d);
+    const row = app.querySelector(`[data-row="${el.dataset.id}"]`); if (row) row.remove();
+    app.querySelectorAll('.card-row .idx').forEach((x, i) => { x.textContent = i + 1; });
+    const t = app.querySelector('.section-title'); if (t) t.textContent = plural(d.cards.length, 'kaart', 'kaarten');
+  },
+  'add-import'(el) { startWizard(el.dataset.id); },
+  export(el) { exportDeck(getDeck(view.deckId), el.dataset.kind); },
+  ask(el) { view.confirm = el.dataset.what; render(); },
+  'confirm-no'() { view.confirm = null; render(); },
+  'reset-yes'() {
+    const d = getDeck(view.deckId);
+    d.cards.forEach(c => Object.assign(c, { st: 'new', k: 0, iv: 0, due: 0, reps: 0, lapses: 0 }));
+    Store.touch(d); view.confirm = null; render(); toast('Voortgang gewist');
+  },
+  backup() { exportBackup(); },
+  async 'app-zip'(el) {
+    el.disabled = true;
+    try {
+      // The offline app's files are published next to this page; pack them into one zip
+      await loadScript(LIB.jszip, 'JSZip');
+      const zip = new JSZip();
+      for (const f of ['index.html', 'sw.js', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'README.md']) {
+        const res = await fetch('app/' + f);
+        if (!res.ok) throw new Error('missing ' + f);
+        zip.file(f, await res.arrayBuffer());
+      }
+      const data = await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' });
+      await saveFile('luca-flashcards.zip', data, 'application/zip');
+    } catch (e) { toast('Downloaden lukte niet. Controleer je internet en probeer opnieuw.'); }
+    el.disabled = false;
+  },
+  async install() {
+    if (!installPrompt) return;
+    installPrompt.prompt();
+    try { await installPrompt.userChoice; } catch (e) { /* closed */ }
+    installPrompt = null; render();
+  },
+  'delete-yes'() { const d = getDeck(view.deckId); Store.removeDeck(d.id); goHome(); toast(`"${d.name}" verwijderd`); }
+};
+
+function focusLastCard() {
+  const inputs = app.querySelectorAll('.card-row:last-child input');
+  if (inputs[0]) { inputs[0].scrollIntoView({ block: 'center' }); inputs[0].focus(); }
+}
+
+app.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || !app.contains(el) || el.disabled) return;
+  const fn = ACT[el.dataset.act]; if (fn) { e.preventDefault(); fn(el, e); }
+});
+
+app.addEventListener('submit', e => {
+  const form = e.target.closest('form'); if (!form) return;
+  e.preventDefault();
+  if (form.dataset.form === 'new-folder') {
+    const name = (document.getElementById('f-name').value || '').trim();
+    if (!name) { document.getElementById('f-name').focus(); return; }
+    const f = createFolder(name);
+    homeFolder = f.id; view = { name: 'home', folder: f.id }; render(); toast(`Map "${f.name}" gemaakt`);
+  } else if (form.dataset.form === 'rename-folder') {
+    const f = getFolder(view.folder); const name = (document.getElementById('f-rename').value || '').trim();
+    if (f && name) { f.name = name.slice(0, 40); Store.touchFolders(); }
+    view.rename = false; render();
+  }
+});
+
+const editTimers = {};
+app.addEventListener('input', e => {
+  const t = e.target;
+  if (t.dataset.wiz) { wiz[t.dataset.wiz] = t.value; return; }
+  if (t.dataset.wizName !== undefined) { const i = +t.dataset.wizName; wiz.names[i] = t.value; wiz.namesEdited[i] = true; const th = app.querySelectorAll('.preview th')[i]; if (th) th.textContent = (i + 1) + '. ' + t.value; return; }
+  if (t.id === 'e-filter') {
+    const q = norm(t.value);
+    app.querySelectorAll('.card-row').forEach(r => { r.hidden = q && !norm([...r.querySelectorAll('input')].map(i => i.value).join(' ')).includes(q); });
+    return;
+  }
+  const d = view.name === 'edit' ? getDeck(view.deckId) : null; if (!d) return;
+  if (t.dataset.card) { const c = d.cards.find(x => x.id === t.dataset.card); if (c) { c.s[+t.dataset.side] = t.value; } }
+  else if (t.dataset.deckField) d[t.dataset.deckField] = t.value;
+  else if (t.dataset.deckName !== undefined) d.names[+t.dataset.deckName] = t.value;
+  else return;
+  clearTimeout(editTimers[d.id]); editTimers[d.id] = setTimeout(() => Store.touch(d), 400);
+});
+
+// Folder pickers: "+ Nieuwe map…" asks for a name inline
+function pickFolder(select, apply) {
+  if (select.value !== '__new__') { apply(select.value); return; }
+  const box = document.createElement('div'); box.className = 'inline-new';
+  box.innerHTML = `<input class="field" id="inline-folder" placeholder="Naam van de nieuwe map" maxlength="40"><button class="btn primary sm" type="button" id="inline-folder-ok">Maak</button>`;
+  select.hidden = true; select.after(box);
+  const inp = box.querySelector('input'); inp.focus();
+  const done = () => { const name = inp.value.trim(); if (name) { const f = createFolder(name); apply(f.id); } render(); };
+  box.querySelector('button').addEventListener('click', done);
+  inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); done(); } else if (ev.key === 'Escape') render(); });
+}
+
+app.addEventListener('change', e => {
+  const t = e.target;
+  if (t.id === 'w-file' && t.files && t.files[0]) { loadFile(t.files[0]); return; }
+  if (t.id === 'backup-file' && t.files && t.files[0]) { importBackup(t.files[0]); return; }
+  if (t.id === 'w-sheet') { wiz.sheet = t.value; applySheet(); return; }
+  if (t.id === 'w-header') { wiz.header = t.checked; refreshNames(); render(); return; }
+  if (t.id === 'w-folder') { pickFolder(t, v => { wiz.folder = v; }); return; }
+  if (t.dataset.wizCol !== undefined) { wiz.map[+t.dataset.wizCol] = +t.value; refreshNames(); render(); return; }
+  const d = view.name === 'edit' ? getDeck(view.deckId) : null; if (!d) return;
+  if (t.id === 'e-folder') { pickFolder(t, v => { d.folder = v; Store.touch(d); homeFolder = v || null; toast(v ? `Verplaatst naar "${getFolder(v).name}"` : 'Uit de map gehaald'); }); return; }
+  if (t.dataset.deckLang !== undefined) d.langs[+t.dataset.deckLang] = t.value;
+  else if (t.dataset.opt) { d.opt = d.opt || {}; d.opt[t.dataset.opt] = t.type === 'checkbox' ? t.checked : +t.value; }
+  else return;
+  Store.touch(d);
+});
+
+async function loadFile(file) {
+  wiz.loading = true; wiz.error = ''; render();
+  try { const sheets = await readFile(file); wiz.loading = false; setSheets(sheets, file.name); }
+  catch (err) {
+    wiz.loading = false;
+    wiz.error = err && err.userMsg ? err.userMsg
+      : err && err.message === 'nolib' ? 'De lezer voor dit soort bestand kon niet laden (geen internet?). Probeer opnieuw of gebruik Plakken.'
+      : 'Dit bestand kon niet gelezen worden. Sla het op als .xlsx, .csv of .docx en probeer opnieuw, of kopieer de lijst en gebruik Plakken.';
+    render();
+  }
+}
+
+app.addEventListener('dragover', e => { const z = e.target.closest && e.target.closest('#drop'); if (z) { e.preventDefault(); z.classList.add('over'); } });
+app.addEventListener('dragleave', e => { const z = e.target.closest && e.target.closest('#drop'); if (z) z.classList.remove('over'); });
+app.addEventListener('drop', e => { const z = e.target.closest && e.target.closest('#drop'); if (z) { e.preventDefault(); z.classList.remove('over'); const f = e.dataTransfer.files[0]; if (f) loadFile(f); } });
+
+document.addEventListener('keydown', e => {
+  if (view.name !== 'study' || !session) return;
+  if (e.target.closest && e.target.closest('input,textarea,select')) return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); }
+  else if (session.revealed && e.key === '1') answer('again');
+  else if (session.revealed && e.key === '2') answer('hard');
+  else if (session.revealed && e.key === '3') answer('good');
+  else if (e.key === 'Escape') ACT['study-exit']();
+  else if ((e.key === 'z' || e.key === 'Z') && !e.metaKey && !e.ctrlKey) undo();
+});
+
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'hidden') { Store.flush(); return; }
+  if (view.name === 'home' && !view.newFolder && !view.rename && await Store.refresh()) render();
+});
+
+/* ---------- boot ---------- */
+Store.tombs = Store.loadTombs();
+Store.loadFolders();
+decks = Store.loadLocal().filter(d => d && d.id && Array.isArray(d.cards) && !Store.tombs.has(d.id));
+render();
+Store.initCloud().then(changed => { if (view.name === 'home' && !view.newFolder && !view.rename) render(); else updateSyncChip(); });
+
+// Stand-alone version (own website): work offline and keep data safe
+if (!window.claude) {
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* no offline mode */ });
+  }
+  try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignore */ }
+  window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (view.name === 'home') render(); });
+  window.addEventListener('appinstalled', () => { installPrompt = null; toast('Luca Flashcards is geïnstalleerd'); if (view.name === 'home') render(); });
+}
+</script>
+</body>
+</html>
