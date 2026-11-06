@@ -3025,18 +3025,19 @@ app.addEventListener('submit', async e => {
     if (isCard) { session.commenting = false; render(); } else loadItem();
     return;
   }
-  view.email = val('a-email'); view.username = val('a-user');
+  const email = val('a-email'), pass = val('a-pass'), uname = val('a-user');
+  view.email = email; view.username = uname;
   view.busy = true; view.error = ''; render();
   let err = null;
   try {
-    if (kind === 'login') err = await Cloud.signIn(val('a-email'), val('a-pass'));
-    else if (kind === 'signup') err = await Cloud.signUp(val('a-email'), val('a-pass'), val('a-user'));
+    if (kind === 'login') err = await Cloud.signIn(email, pass);
+    else if (kind === 'signup') err = await Cloud.signUp(email, pass, uname);
     else if (kind === 'reset') {
-      const { error } = await Cloud.sb.auth.resetPasswordForEmail(val('a-email').trim(), { redirectTo: appUrl() });
+      const { error } = await Cloud.sb.auth.resetPasswordForEmail(email.trim(), { redirectTo: appUrl() });
       err = error ? authError(error) : null;
       if (!err) { view = { name: 'auth', mode: 'login' }; render(); toast('Check je mailbox voor de link.'); return; }
     } else if (kind === 'newpass') {
-      const { error } = await Cloud.sb.auth.updateUser({ password: val('a-pass') });
+      const { error } = await Cloud.sb.auth.updateUser({ password: pass });
       err = error ? authError(error) : null;
       if (!err) { toast('Nieuw wachtwoord opgeslagen'); const { data } = await Cloud.sb.auth.getSession(); if (data.session && !Cloud.user) await Cloud.start(data.session.user); view = { name: 'home' }; render(); return; }
     }
