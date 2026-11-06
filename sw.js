@@ -1,4 +1,4 @@
-/* Luca Flashcards — offline support (made by Luca Cicarelli) */
+/* Uni Flashcards — offline support (made by Luca Cicarelli) */
 const VERSION = 'luca-flashcards-v2';
 const LOCAL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-maskable-512.png', './apple-touch-icon.png'];
 const REMOTE = [

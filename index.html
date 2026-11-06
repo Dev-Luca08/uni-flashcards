@@ -10,14 +10,14 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Luca Flashcards">
+<meta name="apple-mobile-web-app-title" content="Uni Flashcards">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <style>
 :root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
 body { margin: 0; font: 14px system-ui, sans-serif; }
 img { max-width: 100%; }
 [hidden] { display: none !important; }
-</style><title>Luca Flashcards</title>
+</style><title>Uni Flashcards</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap">
@@ -401,7 +401,7 @@ textarea.small-ta { min-height: 90px; font-family: var(--font-body); font-size: 
 <script>
 'use strict';
 /* =========================================================
-   Luca Flashcards — made by Luca Cicarelli
+   Uni Flashcards — made by Luca Cicarelli
    ========================================================= */
 
 const LS_KEY = 'tarjeta.decks.v1';
@@ -1242,7 +1242,7 @@ async function importBackup(file) {
     }
     render();
     toast(added || updated ? `Back-up teruggezet: ${plural(added, 'nieuwe set', 'nieuwe sets')}${updated ? `, ${updated} bijgewerkt` : ''}` : 'Alles uit deze back-up stond er al');
-  } catch (e) { toast('Dit is geen back-up van Luca Flashcards.'); }
+  } catch (e) { toast('Dit is geen back-up van Uni Flashcards.'); }
 }
 
 /* ---------- Install as an app (only outside claude.ai) ---------- */
@@ -1251,7 +1251,7 @@ const isStandalone = () => window.matchMedia('(display-mode: standalone)').match
 const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 function installHint() {
   if (window.claude || isStandalone()) return '';
-  if (installPrompt) return `<button class="btn block install-btn" data-act="install">📲 Installeer Luca Flashcards als app</button>`;
+  if (installPrompt) return `<button class="btn block install-btn" data-act="install">📲 Installeer Uni Flashcards als app</button>`;
   if (isIOS()) return `<p class="install-tip">📲 <b>Installeren op iPhone:</b> tik in Safari op het Deel-icoon en kies <b>“Zet op beginscherm”</b>.</p>`;
   return '';
 }
@@ -1360,7 +1360,7 @@ function renderHome() {
   } else main = empty;
 
   return `<header class="home-head">
-      <div class="brand">${brandSvg}<div><h1>Luca Flashcards</h1><p>${Cloud.user && Cloud.me ? '@' + esc(Cloud.me.username) : 'Je sets en mappen'}</p></div></div>
+      <div class="brand">${brandSvg}<div><h1>Uni Flashcards</h1><p>${Cloud.user && Cloud.me ? '@' + esc(Cloud.me.username) : 'Je sets en mappen'}</p></div></div>
       ${topIcons()}
     </header>
     ${loginBanner()}
@@ -2034,7 +2034,7 @@ const Cloud = {
       await this.pullOwn();
       await this.loadShared();
       await this.refreshSocial();
-    } catch (e) { console.warn('Luca Flashcards sync', e); Store.errorShown = true; }
+    } catch (e) { console.warn('Uni Flashcards sync', e); Store.errorShown = true; }
     this.subscribe();
     this.startPolling();
     Stats.flush();
@@ -2104,7 +2104,7 @@ const Cloud = {
     this.chain = this.chain.then(fn).then(() => {
       if (Store.errorShown) { Store.errorShown = false; updateSyncChip(); }
     }).catch(e => {
-      console.warn('Luca Flashcards sync', e);
+      console.warn('Uni Flashcards sync', e);
       if (!Store.errorShown) { Store.errorShown = true; updateSyncChip(); }
     });
     return this.chain;
@@ -2945,7 +2945,7 @@ Object.assign(ACT, {
     toast(error ? 'Lukte niet. Probeer opnieuw.' : (msg[data] || 'Klaar'));
   },
   'copy-friendlink'() { copyText(appUrl() + '#friend=' + Cloud.me.username); },
-  'share-friendlink'() { shareText('Luca Flashcards', `Voeg me toe als vriend op Luca Flashcards: @${Cloud.me.username}`, appUrl() + '#friend=' + Cloud.me.username); },
+  'share-friendlink'() { shareText('Uni Flashcards', `Voeg me toe als vriend op Uni Flashcards: @${Cloud.me.username}`, appUrl() + '#friend=' + Cloud.me.username); },
   async join(el) {
     const { data, error } = await Cloud.sb.rpc('join_item', { p_owner: el.dataset.owner, p_kind: el.dataset.kind, p_item: el.dataset.id });
     if (error || data !== 'joined') { toast(data === 'no_access' ? 'Je hebt geen toegang meer tot deze map of set.' : 'Lukte niet. Probeer opnieuw.'); return; }
@@ -2984,7 +2984,7 @@ Object.assign(ACT, {
     view.data = { ...(view.data || {}), link: appUrl() + '#link=' + data.token }; render();
   },
   'copy-link'() { copyText(view.data.link); },
-  'share-link'() { const obj = itemOf(view.kind, view.id); shareText(obj.name, `Bekijk “${obj.name}” op Luca Flashcards`, view.data.link); },
+  'share-link'() { const obj = itemOf(view.kind, view.id); shareText(obj.name, `Bekijk “${obj.name}” op Uni Flashcards`, view.data.link); },
   async 'comment-status'(el) { await Cloud.sb.rpc('set_comment_status', { p_id: +el.dataset.cid, p_status: el.dataset.st }); loadItem(); },
   async 'comment-del'(el) { await Cloud.sb.from('comments').delete().eq('id', +el.dataset.cid); loadItem(); },
   async 'remove-member'(el) {
@@ -3098,7 +3098,7 @@ if (!window.claude) {
   }
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) { /* ignore */ }
   window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installPrompt = e; if (view.name === 'home') render(); });
-  window.addEventListener('appinstalled', () => { installPrompt = null; toast('Luca Flashcards is geïnstalleerd'); if (view.name === 'home') render(); });
+  window.addEventListener('appinstalled', () => { installPrompt = null; toast('Uni Flashcards is geïnstalleerd'); if (view.name === 'home') render(); });
 }
 </script>
 </body>
